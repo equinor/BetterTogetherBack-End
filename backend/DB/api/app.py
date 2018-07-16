@@ -1,9 +1,9 @@
 from flask import render_template, request, url_for
 from werkzeug.utils import redirect
-from project import tables
-from project import *
+from api import tables
+from api import *
 
-from project import queries
+from api import queries
 
 
 @app.route('/')

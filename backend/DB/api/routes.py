@@ -1,7 +1,7 @@
-from project import app, db, queries
+from api import app, db, queries
 from flask import jsonify, request, abort
 
-from project.tables import User, Pair, Reward
+from api.tables import User, Pair, Reward
 
 
 @app.route('/api/user', methods=['POST'])
