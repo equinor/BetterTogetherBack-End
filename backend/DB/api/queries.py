@@ -1,6 +1,6 @@
 from sqlalchemy import func, or_, and_
-from api import db
-from api import tables
+from backend.DB.api import db
+from backend.DB.api import tables
 
 
 # Queries for User
@@ -126,9 +126,10 @@ def add_threshold(threshold):
 
 
 def get_threshold(reward_type):
-    return tables.Threshold.query.first()
+    return tables.Threshold.query.filter_by(reward_type=reward_type).first()
 
 
 def update_threshold(threshold):
     tables.Threshold.query.filter_by(reward_type=threshold.reward_type).update(
         {'threshold': threshold.threshold})
+    db.session.commit()

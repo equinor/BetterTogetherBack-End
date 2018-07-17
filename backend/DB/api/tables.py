@@ -4,7 +4,7 @@ from datetime import datetime
 
 from sqlalchemy.orm import relationship
 
-from api import db
+from backend.DB.api import db
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
 
@@ -49,7 +49,7 @@ class Pair(db.Model):
 
 class Threshold(db.Model):
     reward_type = db.Column(db.String, primary_key=True)
-    threshold = db.Column(db.Integer, primary_key=True)
+    threshold = db.Column(db.Integer)
 
     def __init__(self, reward_type, threshold):
         self.reward_type = reward_type
