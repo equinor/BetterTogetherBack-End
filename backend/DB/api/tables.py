@@ -49,7 +49,7 @@ class Pair(db.Model):
 
 class Threshold(db.Model):
     reward_type = db.Column(db.String, primary_key=True)
-    threshold = db.Column(db.Integer, primary_key=True)
+    threshold = db.Column(db.Integer)
 
     def __init__(self, reward_type, threshold):
         self.reward_type = reward_type
