@@ -39,6 +39,7 @@ def get_active_users():
         output.append(user_data)
     return jsonify({'users': output})
 
+
 @app.route('/api/user/get/<username>', methods=['GET'])
 def get_user(username):
     user = queries.get_user_by_username(username)
