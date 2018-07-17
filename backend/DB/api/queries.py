@@ -87,9 +87,9 @@ def get_rewards():
     return tables.Reward.query.all()
 
 
-def get_unused_rewards_by_type(reward_type):
+def get_unused_rewards_count_by_type(reward_type):
     return tables.Reward.query.filter(and_(
-        tables.Reward.reward_type == reward_type, tables.Reward.used_reward == 0)).all()
+        tables.Reward.reward_type == reward_type, tables.Reward.used_reward == 0)).count()
 
 
 def get_last_reward_type():

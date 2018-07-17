@@ -132,7 +132,7 @@ class DatabaseTester(unittest.TestCase):
         rv = self.app.get('/api/pair/at_date/get/%d' % date)
         self.assertEqual('test3', rv.json.get('person1'))
 
-    def test_get_rewards(self):
+    def test_get_reward_count(self):
         reward1 = {'reward_type': 'pizza'}
         reward2 = {'reward_type': 'cake'}
         reward3 = {'reward_type': 'pizza'}
@@ -143,10 +143,10 @@ class DatabaseTester(unittest.TestCase):
 
         rewards = self.app.get('/api/reward/all').json.get('rewards')
         self.assertEqual(3, len(rewards))
-        rewards = self.app.get('api/reward/unused/pizza').json.get('rewards')
-        self.assertEqual(2, len(rewards))
-        rewards = self.app.get('api/reward/unused/cake').json.get('rewards')
-        self.assertEqual(1, len(rewards))
+        count = self.app.get('api/reward/unused/pizza').json.get('num_rewards')
+        self.assertEqual(2, count)
+        count = self.app.get('api/reward/unused/cake').json.get('num_rewards')
+        self.assertEqual(1, count)
 
     def test_use_reward(self):
         reward1 = {'reward_type': 'pizza'}
@@ -158,9 +158,9 @@ class DatabaseTester(unittest.TestCase):
         self.app.post('/api/reward/add', data=json.dumps(reward3), content_type='application/json')
 
         self.app.put('/api/reward/use/pizza')
-        rewards = self.app.get('/api/reward/unused/pizza').json.get('rewards')
+        count = self.app.get('/api/reward/unused/pizza').json.get('num_rewards')
 
-        self.assertEqual(1, len(rewards))
+        self.assertEqual(1, count)
 
     def test_get_earliest_unused_reward(self):
         date = math.floor(datetime.datetime.now().timestamp() * 1000)

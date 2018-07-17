@@ -161,9 +161,9 @@ def get_all_rewards():
 
 
 @app.route('/api/reward/unused/<reward_type>', methods=['GET'])
-def get_rewards(reward_type):
-    rewards = queries.get_unused_rewards_by_type(reward_type)
-    return format_rewards(rewards)
+def get_unused_reward_count(reward_type):
+    count = queries.get_unused_rewards_count_by_type(reward_type)
+    return jsonify({'num_rewards': count})
 
 
 @app.route('/api/reward/unused/earliest/<reward_type>', methods=['GET'])
