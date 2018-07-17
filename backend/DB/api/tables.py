@@ -4,7 +4,7 @@ from datetime import datetime
 
 from sqlalchemy.orm import relationship
 
-from api import db
+from backend.DB.api import db
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
 

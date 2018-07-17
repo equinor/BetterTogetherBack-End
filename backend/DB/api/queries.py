@@ -1,6 +1,6 @@
 from sqlalchemy import func, or_, and_
-from api import db
-from api import tables
+from backend.DB.api import db
+from backend.DB.api import tables
 
 
 # Queries for User

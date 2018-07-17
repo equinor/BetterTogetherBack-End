@@ -2,11 +2,11 @@ import datetime
 import json
 import math
 
-from api import app, db
+from backend.DB.api import app, db
 import unittest
 
-from api import routes, tables
-from api.tables import Reward
+from backend.DB.api import routes, tables
+from backend.DB.api.tables import Reward
 
 
 class DatabaseTester(unittest.TestCase):

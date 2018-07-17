@@ -1,7 +1,7 @@
-from api import app, db, queries
+from backend.DB.api import app, db, queries
 from flask import jsonify, request, abort
 
-from api.tables import User, Pair, Reward, Threshold
+from backend.DB.api.tables import User, Pair, Reward, Threshold
 
 
 @app.route('/api/user/add', methods=['POST'])
