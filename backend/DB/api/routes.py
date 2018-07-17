@@ -44,6 +44,7 @@ def get_active_users():
     users = queries.get_active_users()
     return format_users(users)
 
+
 @app.route('/api/user/get/<username>', methods=['GET'])
 def get_user(username):
     user = queries.get_user_by_username(username)
