@@ -9,6 +9,14 @@ def hello_world():
     return 'Hello World'
 
 
+def format_users(users):
+    output = []
+    for user in users:
+        output.append(
+            {'username': user.username, 'firstname': user.firstname, 'lastname': user.lastname, 'active': user.active})
+    return jsonify(output)
+
+
 @app.route('/api/user/add', methods=['POST'])
 def add_user():
     r = request.get_json()
@@ -21,40 +29,25 @@ def add_user():
     lastname = r['lastname']
     user = User(username, firstname, lastname)
     queries.add_user(user)
-    return jsonify(
-        {'username': user.username, 'firstname': user.firstname, 'lastname': user.lastname})
+    return format_users([user])
 
 
 @app.route('/api/user/all', methods=['GET'])
 def get_all_users():
     users = queries.get_all_users()
-    output = []
-    for user in users:
-        user_data = {'username': user.username, 'firstname': user.firstname, 'lastname': user.lastname,
-                     'active': user.active}
-        output.append(user_data)
-    return jsonify({'users': output})
+    return format_users(users)
 
 
 @app.route('/api/user/active', methods=['GET'])
 def get_active_users():
     users = queries.get_active_users()
-    output = []
-    for user in users:
-        user_data = {'username': user.username, 'firstname': user.firstname, 'lastname': user.lastname,
-                     'active': user.active}
-        output.append(user_data)
-    return jsonify({'users': output})
+    return format_users(users)
 
 
 @app.route('/api/user/get/<username>', methods=['GET'])
 def get_user(username):
     user = queries.get_user_by_username(username)
-    return jsonify(
-        {'username': user.username,
-         'firstname': user.firstname,
-         'lastname': user.lastname,
-         'active': user.active})
+    return format_users([user])
 
 
 @app.route('/api/user/update', methods=['PUT'])
@@ -72,11 +65,7 @@ def update_user():
     user.lastname = r['lastname']
     user.active = r['active']
     queries.update_user(user)
-    return jsonify(
-        {'username': user.username,
-         'firstname': user.firstname,
-         'lastname': user.lastname,
-         'active': user.active})
+    return format_users([user])
 
 
 @app.route('/api/user/delete/<username>', methods=['DELETE'])
@@ -155,8 +144,8 @@ def update_pair(date):
 def format_rewards(rewards):
     output = []
     for reward in rewards:
-        output.append({'reward_type': reward.reward_type, 'date': reward.date})
-    return jsonify({'rewards': output})
+        output.append({'reward_type': reward.reward_type, 'date': reward.date, 'used_reward': reward.used_reward})
+    return jsonify(output)
 
 
 @app.route('/api/reward/add', methods=['POST'])
@@ -167,11 +156,13 @@ def add_reward():
         abort(400)
 
     if 'date' not in r:
-        reward = Reward(r['reward_type'])
+        reward = Reward(r['reward_type'].lower())
     else:
-        reward = Reward(r['reward_type'], r['date'])
+        reward = Reward(r['reward_type'].lower(), r['date'])
+    if 'used_reward' in r:
+        reward.used_reward = r['used_reward']
     queries.add_reward(reward)
-    return jsonify({'reward_type': reward.reward_type, 'date': reward.date})
+    return format_rewards([reward])
 
 
 @app.route('/api/reward/all', methods=['GET'])
@@ -182,7 +173,7 @@ def get_all_rewards():
 
 @app.route('/api/reward/unused/<reward_type>', methods=['GET'])
 def get_unused_reward_count(reward_type):
-    count = queries.get_unused_rewards_count_by_type(reward_type)
+    count = queries.get_unused_rewards_count_by_type(reward_type.lower())
     return jsonify({'num_rewards': count})
 
 
