@@ -4,9 +4,16 @@ from flask import jsonify, request, abort
 from backend.DB.api.tables import User, Pair, Reward, Threshold
 
 
+@app.route('/')
+def hello_world():
+    return 'Hello World'
+
+
 @app.route('/api/user/add', methods=['POST'])
 def add_user():
     r = request.get_json()
+    if r is None:
+        return jsonify({'message': 'Something went wrong'})
     if not r['username'] or not r['firstname'] or not r['lastname']:
         return jsonify({'message': 'missing information on user'})
     username = r['username']
@@ -54,6 +61,8 @@ def get_user(username):
 def update_user(username):
     user = queries.get_user_by_username(username)
     r = request.get_json()
+    if r is None:
+        return jsonify({'message': 'Something went wrong'})
     if 'firstname' not in r or 'lastname' not in r or 'active' not in r:
         return jsonify({'message': 'Missing information for user'})
     user.firstname = r['firstname']
@@ -85,6 +94,8 @@ def format_pairs(pairs):
 @app.route('/api/pair/add', methods=['POST'])
 def add_pair():
     r = request.get_json()
+    if r is None:
+        return jsonify({'message': 'Something went wrong'})
     if not r['person1'] or not r['person2']:
         return jsonify({'message': 'Missing information for pair'})
     if 'date' not in r:
@@ -129,6 +140,8 @@ def get_pair(date):
 @app.route('/api/pair/at_date/update/<date>', methods=['PUT'])
 def update_pair(date):
     r = request.get_json()
+    if r is None:
+        return jsonify({'message': 'Something went wrong'})
     pair = [Pair(r['person1'], r['person2'], date)]
     queries.update_pair(pair[0])
     return jsonify(format_pairs(pair)[0])
@@ -144,6 +157,8 @@ def format_rewards(rewards):
 @app.route('/api/reward/add', methods=['POST'])
 def add_reward():
     r = request.get_json()
+    if r is None:
+        return jsonify({'message': 'Something went wrong'})
     if 'reward_type' not in r:
         return jsonify({'message': 'Missing information for creating a reward'})
     if 'date' not in r:
@@ -179,6 +194,8 @@ def use_reward(reward_type):
 @app.route('/api/threshold/add', methods=['POST'])
 def add_threshold():
     r = request.get_json()
+    if r is None:
+        return jsonify({'message': 'Something went wrong'})
     if 'reward_type' not in r or 'threshold' not in r:
         return jsonify({'message': 'missing information for creating a threshold'})
     threshold = Threshold(r['reward_type'], r['threshold'])
@@ -195,9 +212,17 @@ def get_threshold(reward_type):
 @app.route('/api/threshold/update/<reward_type>', methods=['PUT'])
 def update_threshold(reward_type):
     r = request.get_json()
+    if r is None:
+        return jsonify({'message': 'Something went wrong'})
     if 'threshold' not in r:
         return jsonify({'message': 'You need to specify a threshold'})
     threshold = queries.get_threshold(reward_type)
     threshold.threshold = r['threshold']
     queries.update_threshold(threshold)
     return jsonify({'reward_type': threshold.reward_type, 'threshold': threshold.threshold})
+
+
+if __name__ == '__main__':
+    db.create_all()
+    db.init_app(app)
+    app.run(host='0.0.0.0', port=app.config.get("PORT", 5000))
