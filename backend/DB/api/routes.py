@@ -14,7 +14,7 @@ def add_user():
     r = request.get_json()
     if r is None:
         return jsonify({'message': 'Something went wrong'})
-    if not r['username'] or not r['firstname'] or not r['lastname']:
+    if 'username' not in r or 'firstname' not in r or 'lastname' not in r:
         return jsonify({'message': 'missing information on user'})
     username = r['username']
     firstname = r['firstname']
@@ -96,7 +96,7 @@ def add_pair():
     r = request.get_json()
     if r is None:
         return jsonify({'message': 'Something went wrong'})
-    if not r['person1'] or not r['person2']:
+    if 'person1' not in r or 'person2' not in r:
         return jsonify({'message': 'Missing information for pair'})
     if 'date' not in r:
         pair = Pair(r['person1'], r['person2'])

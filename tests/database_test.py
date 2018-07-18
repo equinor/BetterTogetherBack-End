@@ -94,7 +94,6 @@ class DatabaseTester(unittest.TestCase):
         date = math.floor(datetime.datetime.now().timestamp() * 1000)
         reward = {'reward_type': 'pizza', 'date': date}
         self.app.post('/api/reward/add', data=json.dumps(reward), content_type='application/json')
-        print(self.app.get('/api/reward/all').json)
         rv = self.app.get('/api/pair/all/after_last_reward/pizza')
         pairs = rv.json.get('pairs')
         self.assertEqual(0, len(pairs))
@@ -194,3 +193,14 @@ class DatabaseTester(unittest.TestCase):
         self.app.put('/api/threshold/update/pizza', data=json.dumps(updated_info), content_type='application/json')
         threshold = self.app.get('/api/threshold/get/pizza').json.get('threshold')
         self.assertEqual(42, threshold)
+
+    def test_wrong_input(self):
+        faulty_data = {'wrong': 'this is wrong'}
+        response = self.app.post('/api/user/add', data=json.dumps(faulty_data), content_type='application/json')
+        self.assertIn('message', response.json)
+        response = self.app.post('/api/pair/add', data=json.dumps(faulty_data), content_type='application/json')
+        self.assertIn('message', response.json)
+        response = self.app.post('/api/reward/add', data=json.dumps(faulty_data), content_type='application/json')
+        self.assertIn('message', response.json)
+        response = self.app.post('/api/threshold/add', data=json.dumps(faulty_data), content_type='application/json')
+        self.assertIn('message', response.json)
