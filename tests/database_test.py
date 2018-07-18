@@ -197,10 +197,10 @@ class DatabaseTester(unittest.TestCase):
     def test_wrong_input(self):
         faulty_data = {'wrong': 'this is wrong'}
         response = self.app.post('/api/user/add', data=json.dumps(faulty_data), content_type='application/json')
-        self.assertIn('message', response.json)
+        self.assertEqual(400, response.status_code)
         response = self.app.post('/api/pair/add', data=json.dumps(faulty_data), content_type='application/json')
-        self.assertIn('message', response.json)
+        self.assertEqual(400, response.status_code)
         response = self.app.post('/api/reward/add', data=json.dumps(faulty_data), content_type='application/json')
-        self.assertIn('message', response.json)
+        self.assertEqual(400, response.status_code)
         response = self.app.post('/api/threshold/add', data=json.dumps(faulty_data), content_type='application/json')
-        self.assertIn('message', response.json)
+        self.assertEqual(400, response.status_code)

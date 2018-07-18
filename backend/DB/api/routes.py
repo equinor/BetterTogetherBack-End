@@ -12,10 +12,10 @@ def hello_world():
 @app.route('/api/user/add', methods=['POST'])
 def add_user():
     r = request.get_json()
-    if r is None:
-        return jsonify({'message': 'Something went wrong'})
-    if 'username' not in r or 'firstname' not in r or 'lastname' not in r:
-        return jsonify({'message': 'missing information on user'})
+
+    if r is None or 'username' not in r or 'firstname' not in r or 'lastname' not in r:
+        abort(400)
+
     username = r['username']
     firstname = r['firstname']
     lastname = r['lastname']
@@ -61,10 +61,10 @@ def get_user(username):
 def update_user(username):
     user = queries.get_user_by_username(username)
     r = request.get_json()
-    if r is None:
-        return jsonify({'message': 'Something went wrong'})
-    if 'firstname' not in r or 'lastname' not in r or 'active' not in r:
-        return jsonify({'message': 'Missing information for user'})
+
+    if r is None or 'firstname' not in r or 'lastname' not in r or 'active' not in r:
+        abort(400)
+
     user.firstname = r['firstname']
     user.lastname = r['lastname']
     user.active = r['active']
@@ -94,10 +94,10 @@ def format_pairs(pairs):
 @app.route('/api/pair/add', methods=['POST'])
 def add_pair():
     r = request.get_json()
-    if r is None:
-        return jsonify({'message': 'Something went wrong'})
-    if 'person1' not in r or 'person2' not in r:
-        return jsonify({'message': 'Missing information for pair'})
+
+    if r is None or 'person1' not in r or 'person2' not in r:
+        abort(400)
+
     if 'date' not in r:
         pair = Pair(r['person1'], r['person2'])
         queries.add_pair(pair)
@@ -140,8 +140,10 @@ def get_pair(date):
 @app.route('/api/pair/at_date/update/<date>', methods=['PUT'])
 def update_pair(date):
     r = request.get_json()
-    if r is None:
-        return jsonify({'message': 'Something went wrong'})
+
+    if r is None or 'person1' not in r or 'person2' not in r:
+        abort(400)
+
     pair = [Pair(r['person1'], r['person2'], date)]
     queries.update_pair(pair[0])
     return jsonify(format_pairs(pair)[0])
@@ -157,10 +159,10 @@ def format_rewards(rewards):
 @app.route('/api/reward/add', methods=['POST'])
 def add_reward():
     r = request.get_json()
-    if r is None:
-        return jsonify({'message': 'Something went wrong'})
-    if 'reward_type' not in r:
-        return jsonify({'message': 'Missing information for creating a reward'})
+
+    if r is None or 'reward_type' not in r:
+        abort(400)
+
     if 'date' not in r:
         reward = Reward(r['reward_type'])
     else:
@@ -194,10 +196,10 @@ def use_reward(reward_type):
 @app.route('/api/threshold/add', methods=['POST'])
 def add_threshold():
     r = request.get_json()
-    if r is None:
-        return jsonify({'message': 'Something went wrong'})
-    if 'reward_type' not in r or 'threshold' not in r:
-        return jsonify({'message': 'missing information for creating a threshold'})
+
+    if r is None or 'reward_type' not in r or 'threshold' not in r:
+        abort(400)
+
     threshold = Threshold(r['reward_type'], r['threshold'])
     queries.add_threshold(threshold)
     return jsonify({'reward_type': threshold.reward_type, 'threshold': threshold.threshold})
@@ -212,10 +214,10 @@ def get_threshold(reward_type):
 @app.route('/api/threshold/update/<reward_type>', methods=['PUT'])
 def update_threshold(reward_type):
     r = request.get_json()
-    if r is None:
-        return jsonify({'message': 'Something went wrong'})
-    if 'threshold' not in r:
-        return jsonify({'message': 'You need to specify a threshold'})
+
+    if r is None or 'threshold' not in r:
+        abort(400)
+
     threshold = queries.get_threshold(reward_type)
     threshold.threshold = r['threshold']
     queries.update_threshold(threshold)
