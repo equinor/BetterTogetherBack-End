@@ -229,6 +229,7 @@ def pre_populate():
     queries.add_threshold(threshold1)
     queries.add_threshold(threshold2)
 
+
 if __name__ == '__main__':
     db.create_all()
     db.init_app(app)
