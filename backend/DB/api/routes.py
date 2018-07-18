@@ -57,12 +57,15 @@ def get_user(username):
          'active': user.active})
 
 
-@app.route('/api/user/update/<username>', methods=['PUT'])
-def update_user(username):
-    user = queries.get_user_by_username(username)
+@app.route('/api/user/update', methods=['PUT'])
+def update_user():
     r = request.get_json()
 
-    if r is None or 'firstname' not in r or 'lastname' not in r or 'active' not in r:
+    if r is None or 'username' not in r or 'firstname' not in r or 'lastname' not in r or 'active' not in r:
+        abort(400)
+
+    user = queries.get_user_by_username(r['username'])
+    if user is None:
         abort(400)
 
     user.firstname = r['firstname']

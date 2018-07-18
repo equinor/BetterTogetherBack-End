@@ -42,7 +42,7 @@ class DatabaseTester(unittest.TestCase):
 
         user = {'username': 'test2', 'firstname': 'updated', 'lastname': 'user', 'active': 0}
         rv = self.app.put(
-            '/api/user/update/test2', data=json.dumps(user),
+            '/api/user/update', data=json.dumps(user),
             content_type='application/json')
         self.assertFalse(rv.json.get('active'))
 
@@ -54,8 +54,8 @@ class DatabaseTester(unittest.TestCase):
         self.assertNotIn(user_json, rv.json.get('users'))
 
     def test_get_active_users(self):
-        data = {'firstname': 'updated', 'lastname': 'user', 'active': False}
-        self.app.put('/api/user/update/test2', data=json.dumps(data), content_type='application/json')
+        data = {'username': 'test2', 'firstname': 'updated', 'lastname': 'user', 'active': False}
+        self.app.put('/api/user/update', data=json.dumps(data), content_type='application/json')
         rv = self.app.get('/api/user/active')
         users = rv.json.get('users')
         usernames = []
