@@ -18,16 +18,14 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
 
 class User(db.Model):
     username = db.Column('user_name', db.String, primary_key=True)
-    firstname = db.Column('first_name', db.String)
-    lastname = db.Column('last_name', db.String)
+    name = db.Column('name', db.String)
     active = db.Column('active', db.Integer)
+    image = db.Column('image', db.String)
 
-    #    image = db.Column(db.Blob)
-
-    def __init__(self, username, firstname, lastname):
+    def __init__(self, username, name, image='unknown'):
         self.username = username
-        self.firstname = firstname
-        self.lastname = lastname
+        self.name = name
+        self.image = image
         self.active = True
 
 
