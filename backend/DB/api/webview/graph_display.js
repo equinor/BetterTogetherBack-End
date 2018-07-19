@@ -5,9 +5,9 @@ let cake_thres = 30, pizza_thres = 70;
 
 let radius = width / 50;
 
-d3.json("json_users", (users) => {
+d3.json("api/user/active", (users) => {
 
-    d3.json("json_pairs", (edge_users) => {
+    d3.json("api/pair/pair_count", (edge_users) => {
 
     var setCakeProgress = d3.select('#cake')
         .attr('style', "width:"+cake/cake_thres*100+"%")

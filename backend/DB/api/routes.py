@@ -1,14 +1,18 @@
 from backend.DB.api import app, db, queries
-from flask import jsonify, request, abort
+from flask import jsonify, request, abort, render_template
 from backend.slack import slackbot
 
 from backend.DB.api.tables import User, Pair, Reward, Threshold
 
 
 @app.route('/')
-def hello_world():
+def graph_display():
     #pre_populate()
-    return 'Hello World'
+    return render_template("graph_display.html")
+
+@app.route('/json_pairs')
+def render_tt():
+    return open('static/pairs.json').read()
 
 
 def format_users(users):
