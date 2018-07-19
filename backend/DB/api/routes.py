@@ -1,5 +1,6 @@
 from backend.DB.api import app, db, queries
 from flask import jsonify, request, abort
+from backend.slack import slackbot
 
 from backend.DB.api.tables import User, Pair, Reward, Threshold
 
@@ -13,7 +14,7 @@ def format_users(users):
     output = []
     for user in users:
         output.append(
-            {'username': user.username, 'firstname': user.firstname, 'lastname': user.lastname, 'active': user.active})
+            {'username': user.username, 'name': user.name, 'active': user.active})
     return jsonify(output)
 
 
@@ -21,13 +22,12 @@ def format_users(users):
 def add_user():
     r = request.get_json()
 
-    if r is None or 'username' not in r or 'firstname' not in r or 'lastname' not in r:
+    if r is None or 'username' not in r or 'name' not in r:
         abort(400)
 
     username = r['username']
-    firstname = r['firstname']
-    lastname = r['lastname']
-    user = User(username, firstname, lastname)
+    name = r['name']
+    user = User(username, name)
     queries.add_user(user)
     return format_users([user])
 
@@ -54,15 +54,14 @@ def get_user(username):
 def update_user():
     r = request.get_json()
 
-    if r is None or 'username' not in r or 'firstname' not in r or 'lastname' not in r or 'active' not in r:
+    if r is None or 'username' not in r or 'name' not in r or 'active' not in r:
         abort(400)
 
     user = queries.get_user_by_username(r['username'])
     if user is None:
         abort(400)
 
-    user.firstname = r['firstname']
-    user.lastname = r['lastname']
+    user.name = r['name']
     user.active = r['active']
     queries.update_user(user)
     return format_users([user])
@@ -218,7 +217,12 @@ def update_threshold(reward_type):
     return jsonify({'reward_type': threshold.reward_type, 'threshold': threshold.threshold})
 
 
+def pre_populate():
+    slackbot.get_persons_from_slack()
+
+
 if __name__ == '__main__':
     db.create_all()
     db.init_app(app)
     app.run(host='0.0.0.0', port=app.config.get("PORT", 5000))
+    #prepopulate()

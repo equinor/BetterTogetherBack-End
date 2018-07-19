@@ -19,11 +19,11 @@ class DatabaseTester(unittest.TestCase):
         db.create_all()
         # Test users
         data = [
-            {'active': 1, 'firstname': 'per', 'lastname': 'pål', 'username': 'test1'},
-            {'active': 1, 'firstname': 'per', 'lastname': 'pål', 'username': 'test2'},
-            {'active': 1, 'firstname': 'per', 'lastname': 'pål', 'username': 'test3'},
-            {'active': 1, 'firstname': 'per', 'lastname': 'pål', 'username': 'test4'},
-            {'active': 1, 'firstname': 'per', 'lastname': 'pål', 'username': 'test5'},
+            {'active': 1, 'name': 'Per Pål', 'username': 'test1'},
+            {'active': 1, 'name': 'Per Pål', 'username': 'test2'},
+            {'active': 1, 'name': 'Per Pål', 'username': 'test3'},
+            {'active': 1, 'name': 'Per Pål', 'username': 'test4'},
+            {'active': 1, 'name': 'Per Pål', 'username': 'test5'},
         ]
         for user in data:
             self.app.post('/api/user/add', data=json.dumps(user), content_type='application/json')
@@ -40,7 +40,7 @@ class DatabaseTester(unittest.TestCase):
 
     def test_disable_and_update_user(self):
 
-        user = {'username': 'test2', 'firstname': 'updated', 'lastname': 'user', 'active': 0}
+        user = {'username': 'test2', 'name': 'updated', 'active': 0}
         rv = self.app.put(
             '/api/user/update', data=json.dumps(user),
             content_type='application/json')
@@ -50,11 +50,11 @@ class DatabaseTester(unittest.TestCase):
         rv = self.app.delete('/api/user/delete/test1')
         self.assertEqual(rv.json.get('message'), 'test1 deleted')
         rv = self.app.get('/api/user/all')
-        user_json = {'active': 1, 'firstname': 'per', 'lastname': 'pål', 'username': 'test1'}
+        user_json = {'active': 1, 'name': 'Per Pål', 'username': 'test1'}
         self.assertNotIn(user_json, rv.json)
 
     def test_get_active_users(self):
-        data = {'username': 'test2', 'firstname': 'updated', 'lastname': 'user', 'active': False}
+        data = {'username': 'test2', 'name': 'updated', 'active': False}
         self.app.put('/api/user/update', data=json.dumps(data), content_type='application/json')
         rv = self.app.get('/api/user/active')
         users = rv.json

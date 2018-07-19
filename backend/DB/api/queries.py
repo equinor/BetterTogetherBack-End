@@ -27,15 +27,9 @@ def delete_user(username):
     db.session.commit()
 
 
-def disable_user(username):
-    tables.User.query.filter_by(username=username).update(
-        {'firstname': "Unknown", 'lastname': "User", 'active': False})
-    db.session.commit()
-
-
 def update_user(user):
     tables.User.query.filter_by(username=user.username).update(
-        {'active': user.active, 'firstname': user.firstname, 'lastname': user.lastname})
+        {'active': user.active, 'name': user.name})
     db.session.commit()
 
 
