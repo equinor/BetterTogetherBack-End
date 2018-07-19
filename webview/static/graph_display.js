@@ -1,6 +1,7 @@
 let width = 1500, height = 750;
 
 let cake = 20, pizza = 40;
+let cake_thres = 30, pizza_thres = 70;
 
 let radius = width / 50;
 
@@ -9,10 +10,14 @@ d3.json("json_users", (users) => {
     d3.json("json_pairs", (edge_users) => {
 
     var setCakeProgress = d3.select('#cake')
-        .attr('style', "width:"+cake+"%");
+        .attr('style', "width:"+cake/cake_thres*100+"%")
+        .attr("aria-valuemax", cake_thres)
+        .text(cake.toString()+"/"+cake_thres.toString());
 
     var setPizzaProgress = d3.select('#pizza')
-        .attr('style', "width:"+pizza+"%");
+        .attr('style', "width:"+pizza/pizza_thres*100+"%")
+        .attr("aria-valuemax", pizza_thres)
+        .text(pizza.toString()+"/"+pizza_thres.toString());
 
       //Add patterns to images
      var defs = d3.select('#patterns_svg')
