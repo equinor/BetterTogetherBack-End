@@ -72,7 +72,7 @@ class DatabaseTester(unittest.TestCase):
         self.assertEqual(pair, json_file)
 
         rv = self.app.get('/api/pair/all')
-        pairs = rv.json.get('pairs')
+        pairs = rv.json
         output = []
         for pair in pairs:
             output.append(pair.get('date'))
@@ -95,12 +95,12 @@ class DatabaseTester(unittest.TestCase):
         reward = {'reward_type': 'pizza', 'date': date}
         self.app.post('/api/reward/add', data=json.dumps(reward), content_type='application/json')
         rv = self.app.get('/api/pair/all/after_last_reward/pizza')
-        pairs = rv.json.get('pairs')
+        pairs = rv.json
         self.assertEqual(0, len(pairs))
         pair = {'date': date, 'person1': 'test1', 'person2': 'test3'}
         self.app.post('/api/pair/add', data=json.dumps(pair), content_type='application/json')
         rv = self.app.get('api/pair/all/after_last_reward/pizza')
-        pairs = rv.json.get('pairs')
+        pairs = rv.json
         self.assertEqual(1, len(pairs))
 
     def test_get_pair_after_date(self):
@@ -142,9 +142,9 @@ class DatabaseTester(unittest.TestCase):
 
         rewards = self.app.get('/api/reward/all').json
         self.assertEqual(3, len(rewards))
-        count = self.app.get('api/reward/unused/pizza').json.get('num_rewards')
+        count = self.app.get('api/reward/unused/pizza').json
         self.assertEqual(2, count)
-        count = self.app.get('api/reward/unused/cake').json.get('num_rewards')
+        count = self.app.get('api/reward/unused/cake').json
         self.assertEqual(1, count)
 
     def test_use_reward(self):
@@ -157,7 +157,7 @@ class DatabaseTester(unittest.TestCase):
         self.app.post('/api/reward/add', data=json.dumps(reward3), content_type='application/json')
 
         self.app.put('/api/reward/use/pizza')
-        count = self.app.get('/api/reward/unused/pizza').json.get('num_rewards')
+        count = self.app.get('/api/reward/unused/pizza').json
 
         self.assertEqual(1, count)
 
@@ -181,9 +181,9 @@ class DatabaseTester(unittest.TestCase):
         threshold2 = {'threshold': 42, 'reward_type': 'cake'}
         self.app.post('/api/threshold/add', data=json.dumps(threshold1), content_type='application/json')
         self.app.post('/api/threshold/add', data=json.dumps(threshold2), content_type='application/json')
-        threshold = self.app.get('/api/threshold/get/pizza').json.get('threshold')
+        threshold = self.app.get('/api/threshold/get/pizza').json[0].get('threshold')
         self.assertEqual(50, threshold)
-        threshold = self.app.get('/api/threshold/get/cake').json.get('threshold')
+        threshold = self.app.get('/api/threshold/get/cake').json[0].get('threshold')
         self.assertEqual(42, threshold)
 
     def test_update_threshold(self):
@@ -191,7 +191,7 @@ class DatabaseTester(unittest.TestCase):
         self.app.post('/api/threshold/add', data=json.dumps(data), content_type='application/json')
         updated_info = {'threshold': 42}
         self.app.put('/api/threshold/update/pizza', data=json.dumps(updated_info), content_type='application/json')
-        threshold = self.app.get('/api/threshold/get/pizza').json.get('threshold')
+        threshold = self.app.get('/api/threshold/get/pizza').json[0].get('threshold')
         self.assertEqual(42, threshold)
 
     def test_wrong_input(self):

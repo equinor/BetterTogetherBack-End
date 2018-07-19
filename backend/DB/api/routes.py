@@ -7,6 +7,7 @@ from backend.DB.api.tables import User, Pair, Reward, Threshold
 
 @app.route('/')
 def hello_world():
+    #pre_populate()
     return 'Hello World'
 
 
@@ -14,7 +15,7 @@ def format_users(users):
     output = []
     for user in users:
         output.append(
-            {'username': user.username, 'name': user.name, 'active': user.active})
+            {'username': user.username, 'name': user.name, 'image': user.image, 'active': user.active})
     return jsonify(output)
 
 
@@ -102,7 +103,7 @@ def add_pair():
 def get_all_pairs():
     pairs = queries.get_pair_history()
     output = format_pairs(pairs)
-    return jsonify({'pairs': output})
+    return jsonify(output)
 
 
 @app.route('/api/pair/all/after_date/<date>', methods=['GET'])
@@ -120,7 +121,7 @@ def get_pairs_with_user(username):
 @app.route('/api/pair/all/after_last_reward/<reward_type>', methods=['GET'])
 def get_pairs_since_last_reward(reward_type):
     pairs = queries.get_pair_since_last_reward(reward_type)
-    return jsonify({'pairs': format_pairs(pairs)})
+    return jsonify(format_pairs(pairs))
 
 
 @app.route('/api/pair/at_date/get/<date>', methods=['GET'])
@@ -173,7 +174,7 @@ def get_all_rewards():
 @app.route('/api/reward/unused/<reward_type>', methods=['GET'])
 def get_unused_reward_count(reward_type):
     count = queries.get_unused_rewards_count_by_type(reward_type.lower())
-    return jsonify({'num_rewards': count})
+    return jsonify(count)
 
 
 @app.route('/api/reward/unused/earliest/<reward_type>', methods=['GET'])
@@ -195,13 +196,15 @@ def add_threshold():
 
     threshold = Threshold(r['reward_type'], r['threshold'])
     queries.add_threshold(threshold)
-    return jsonify({'reward_type': threshold.reward_type, 'threshold': threshold.threshold})
+    return jsonify([{'reward_type': threshold.reward_type, 'threshold': threshold.threshold}])
 
 
 @app.route('/api/threshold/get/<reward_type>', methods=['GET'])
 def get_threshold(reward_type):
     threshold = queries.get_threshold(reward_type)
-    return jsonify({'reward_type': threshold.reward_type, 'threshold': threshold.threshold})
+    if threshold is None:
+        return jsonify([])
+    return jsonify([{'reward_type': threshold.reward_type, 'threshold': threshold.threshold}])
 
 
 @app.route('/api/threshold/update/<reward_type>', methods=['PUT'])
@@ -218,11 +221,15 @@ def update_threshold(reward_type):
 
 
 def pre_populate():
-    slackbot.get_persons_from_slack()
-
+    #persons = slackbot.get_persons_from_slack()
+    #for person in persons:
+    #    queries.add_user(User(person['username'], person['name'], person['image']))
+    threshold1 = Threshold('pizza', 50)
+    threshold2 = Threshold('cake', 42)
+    queries.add_threshold(threshold1)
+    queries.add_threshold(threshold2)
 
 if __name__ == '__main__':
     db.create_all()
     db.init_app(app)
     app.run(host='0.0.0.0', port=app.config.get("PORT", 5000))
-    #prepopulate()
