@@ -1,12 +1,16 @@
 from sqlalchemy import func, or_, and_
 from backend.DB.api import db
 from backend.DB.api import tables
+from sqlalchemy.exc import IntegrityError
 
 
 # Queries for User
 def add_user(user):
-    db.session.add(user)
-    db.session.commit()
+    try:
+        db.session.add(user)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
 
 
 def get_active_users():
@@ -35,8 +39,11 @@ def update_user(user):
 
 # Queries for pair
 def add_pair(pair):
-    db.session.add(pair)
-    db.session.commit()
+    try:
+        db.session.add(pair)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
 
 
 def get_pair_history():
@@ -73,8 +80,11 @@ def update_pair(pair):
 
 # Queries for reward
 def add_reward(reward):
-    db.session.add(reward)
-    db.session.commit()
+    try:
+        db.session.add(reward)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
 
 
 def get_rewards():
@@ -115,8 +125,11 @@ def use_reward(reward_type):
 
 # Queries for threshold
 def add_threshold(threshold):
-    db.session.add(threshold)
-    db.session.commit()
+    try:
+        db.session.add(threshold)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
 
 
 def get_threshold(reward_type):

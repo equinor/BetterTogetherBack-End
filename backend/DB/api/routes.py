@@ -1,13 +1,11 @@
 from backend.DB.api import app, db, queries
 from flask import jsonify, request, abort
-from backend.slack import slackbot
 
 from backend.DB.api.tables import User, Pair, Reward, Threshold
 
 
 @app.route('/')
 def hello_world():
-    #pre_populate()
     return 'Hello World'
 
 
@@ -220,17 +218,5 @@ def update_threshold(reward_type):
     return jsonify({'reward_type': threshold.reward_type, 'threshold': threshold.threshold})
 
 
-def pre_populate():
-    #persons = slackbot.get_persons_from_slack()
-    #for person in persons:
-    #    queries.add_user(User(person['username'], person['name'], person['image']))
-    threshold1 = Threshold('pizza', 50)
-    threshold2 = Threshold('cake', 42)
-    queries.add_threshold(threshold1)
-    queries.add_threshold(threshold2)
-
-
 if __name__ == '__main__':
-    db.create_all()
-    db.init_app(app)
-    app.run(host='0.0.0.0', port=app.config.get("PORT", 5000))
+    app.run(port=app.config.get("PORT", 5000))
