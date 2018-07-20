@@ -1,26 +1,35 @@
 let width = 1500, height = 750;
 
-let cake = 20, pizza = 40;
-let cake_thres = 30, pizza_thres = 70;
-
 let radius = width / 50;
 
-d3.json("api/user/active", (users) => {
+d3.json("api/user/all", (users) => {
 
-    d3.json("api/pair/pair_count", (edge_users) => {
+    d3.json("api/pair/count_pairs", (edge_users) => {
 
-    var setCakeProgress = d3.select('#cake')
-        .attr('style', "width:"+cake/cake_thres*100+"%")
+        let cake = 20, pizza = 40;
+        let cake_thres = 30, pizza_thres = 70;
+
+    let user_indices = {};
+    users.forEach((v, i) => user_indices[v.username] = i);
+    let links = edge_users.map((v) => ({
+        'source': user_indices[v.source],
+        'target': user_indices[v.target],
+        'total': v.total,
+    }));
+
+
+    let setCakeProgress = d3.select('#cake')
+        .attr('style', "width:"+cake+"%")
         .attr("aria-valuemax", cake_thres)
         .text(cake.toString()+"/"+cake_thres.toString());
 
-    var setPizzaProgress = d3.select('#pizza')
-        .attr('style', "width:"+pizza/pizza_thres*100+"%")
+    let setPizzaProgress = d3.select('#pizza')
+        .attr('style', "width:"+pizza+"%")
         .attr("aria-valuemax", pizza_thres)
         .text(pizza.toString()+"/"+pizza_thres.toString());
 
       //Add patterns to images
-     var defs = d3.select('#patterns_svg')
+     let defs = d3.select('#patterns_svg')
             .selectAll('pattern')
             .data(users)
             .enter()
@@ -36,12 +45,12 @@ d3.json("api/user/active", (users) => {
             .attr('preserveAspectRatio','none')
             .attr('href', function(d){
                 if (d.image === "unknown") {
-                    return "../static/default.png"
+                    return "../webview/default.png"
                 } else {
                     return d.image}});
 
     //Add nodes to <class>-es
-    var node = d3.select('#circles')
+    let node = d3.select('#circles')
             .selectAll('circle')
             .data(users)
             .enter().append('circle')
@@ -50,15 +59,17 @@ d3.json("api/user/active", (users) => {
             .attr('fill', function(d){
             return 'url(#'+d.username+')'});
 
-    var simulation = d3.forceSimulation(users)
+
+    let simulation = d3.forceSimulation(users)
         .force('collision', d3.forceCollide().radius(radius + 10))
         .force('center', d3.forceCenter(width/2, height/2))
-        .force('charge', d3.forceManyBody().strength(5))
-        .force('link', d3.forceLink().links(edge_users).strength(1))
+        .force('charge', d3.forceManyBody().strength(10))
+        .force('link', d3.forceLink().links(links).strength(1))
+        //.velocityDecay(0.1)
         .on('tick', ticked);
 
 
-    var drag_handler = d3.drag()
+    let drag_handler = d3.drag()
 	.on("start", drag_start)
 	.on("drag", drag_drag)
 	.on("end", drag_end);
@@ -86,9 +97,9 @@ d3.json("api/user/active", (users) => {
 
 
     function updateLinks() {
-        var class_link = d3.select('#links')
+        let class_link = d3.select('#links')
             .selectAll('line')
-            .data(edge_users);
+            .data(links);
 
         class_link.enter()
             .append('line')
@@ -97,7 +108,7 @@ d3.json("api/user/active", (users) => {
             .attr('x1', (d) => d.source.x)
             .attr('y1', (d) => d.source.y)
             .attr('x2', (d) => d.target.x)
-            .attr('y2', (d) =>  d.target.y);
+            .attr('y2', (d) => d.target.y);
         class_link.exit().remove()
     }
 
