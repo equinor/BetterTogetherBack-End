@@ -131,6 +131,18 @@ class DatabaseTester(unittest.TestCase):
         rv = self.app.get('/api/pair/at_date/get/%d' % date)
         self.assertEqual('test3', rv.json.get('person1'))
 
+    def test_get_pair_count(self):
+        pair1 = {'person1': 'test1', 'person2': 'test2'}
+        pair2 = {'person1': 'test2', 'person2': 'test1'}
+        pair3 = {'person1': 'test1', 'person2': 'test3'}
+        self.app.post('/api/pair/add', data=json.dumps(pair1), content_type='application/json')
+        self.app.post('/api/pair/add', data=json.dumps(pair2), content_type='application/json')
+        self.app.post('/api/pair/add', data=json.dumps(pair3), content_type='application/json')
+        response = self.app.get('/api/pair/count_pair').json
+        self.assertEqual(2, len(response))
+        self.assertEqual(2, response[0]['total'])
+        self.assertEqual(1, response[1]['total'])
+
     def test_get_reward_count(self):
         reward1 = {'reward_type': 'pizza'}
         reward2 = {'reward_type': 'cake'}

@@ -1,12 +1,16 @@
 from sqlalchemy import func, or_, and_
 from backend.DB.api import db
 from backend.DB.api import tables
+from sqlalchemy.exc import IntegrityError
 
 
 # Queries for User
 def add_user(user):
-    db.session.add(user)
-    db.session.commit()
+    try:
+        db.session.add(user)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
 
 
 def get_active_users():
@@ -35,8 +39,11 @@ def update_user(user):
 
 # Queries for pair
 def add_pair(pair):
-    db.session.add(pair)
-    db.session.commit()
+    try:
+        db.session.add(pair)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
 
 
 def get_pair_history():
@@ -65,6 +72,26 @@ def get_pair(date):
     return tables.Pair.query.filter_by(date=date).first()
 
 
+def get_pair_count_between_all_users():
+    pairs = db.session.query(tables.Pair.person1, tables.Pair.person2, db.func.count(
+        tables.Pair.person1)).group_by(tables.Pair.person1, tables.Pair.person2).all()
+    counters = []
+    for pair in pairs:
+        should_add_pair = True
+        for i in range(len(counters)):
+            if (pair[0] == counters[i]['target']) and (pair[1] == counters[i]['source']):
+                counters[i]['total'] += pair[2]
+                should_add_pair = False
+        if should_add_pair:
+            counters.append({'source': pair[0], 'target': pair[1], 'total': pair[2]})
+    return counters
+
+
+
+
+
+
+
 def update_pair(pair):
     tables.Pair.query.filter_by(date=pair.date).update(
         {'person1': pair.person1, 'person2': pair.person2})
@@ -73,8 +100,11 @@ def update_pair(pair):
 
 # Queries for reward
 def add_reward(reward):
-    db.session.add(reward)
-    db.session.commit()
+    try:
+        db.session.add(reward)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
 
 
 def get_rewards():
@@ -115,8 +145,11 @@ def use_reward(reward_type):
 
 # Queries for threshold
 def add_threshold(threshold):
-    db.session.add(threshold)
-    db.session.commit()
+    try:
+        db.session.add(threshold)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
 
 
 def get_threshold(reward_type):
