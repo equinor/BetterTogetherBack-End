@@ -72,6 +72,26 @@ def get_pair(date):
     return tables.Pair.query.filter_by(date=date).first()
 
 
+def get_pair_count_between_all_users():
+    pairs = db.session.query(tables.Pair.person1, tables.Pair.person2, db.func.count(
+        tables.Pair.person1)).group_by(tables.Pair.person1, tables.Pair.person2).all()
+    counters = []
+    for pair in pairs:
+        should_add_pair = True
+        for i in range(len(counters)):
+            if (pair[0] == counters[i]['target']) and (pair[1] == counters[i]['source']):
+                counters[i]['total'] += pair[2]
+                should_add_pair = False
+        if should_add_pair:
+            counters.append({'source': pair[0], 'target': pair[1], 'total': pair[2]})
+    return counters
+
+
+
+
+
+
+
 def update_pair(pair):
     tables.Pair.query.filter_by(date=pair.date).update(
         {'person1': pair.person1, 'person2': pair.person2})

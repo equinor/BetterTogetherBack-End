@@ -122,6 +122,12 @@ def get_pairs_since_last_reward(reward_type):
     return jsonify(format_pairs(pairs))
 
 
+@app.route('/api/pair/count_pairs/', methods=['GET'])
+def get_pair_count_between_all_users():
+    counters = queries.get_pair_count_between_all_users()
+    return jsonify(counters)
+
+
 @app.route('/api/pair/at_date/get/<date>', methods=['GET'])
 def get_pair(date):
     return jsonify(format_pairs([queries.get_pair(date)])[0])
@@ -219,4 +225,4 @@ def update_threshold(reward_type):
 
 
 if __name__ == '__main__':
-    app.run(port=app.config.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=app.config.get("PORT", 5000))
