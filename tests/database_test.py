@@ -138,7 +138,7 @@ class DatabaseTester(unittest.TestCase):
         self.app.post('/api/pair/add', data=json.dumps(pair1), content_type='application/json')
         self.app.post('/api/pair/add', data=json.dumps(pair2), content_type='application/json')
         self.app.post('/api/pair/add', data=json.dumps(pair3), content_type='application/json')
-        response = self.app.get('/api/pair/count_pairs').json
+        response = self.app.get('/api/pair/count_pair').json
         self.assertEqual(2, len(response))
         self.assertEqual(2, response[0]['total'])
         self.assertEqual(1, response[1]['total'])
