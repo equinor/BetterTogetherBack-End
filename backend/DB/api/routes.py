@@ -1,12 +1,12 @@
 from backend.DB.api import app, db, queries
-from flask import jsonify, request, abort
+from flask import jsonify, request, abort, render_template
 
 from backend.DB.api.tables import User, Pair, Reward, Threshold
 
 
 @app.route('/')
-def hello_world():
-    return 'Hello World'
+def graph_display():
+    return render_template('graph_display.html')
 
 
 def format_users(users):
@@ -225,4 +225,4 @@ def update_threshold(reward_type):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=app.config.get("PORT", 5000))
+    app.run(host='127.0.0.1', port=app.config.get("PORT", 5000))
