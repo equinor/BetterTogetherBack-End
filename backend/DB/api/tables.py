@@ -36,6 +36,12 @@ class Pair(db.Model):
     user1 = relationship("User", cascade="all,delete", foreign_keys=[person1])
     user2 = relationship("User", cascade="all,delete", foreign_keys=[person2])
 
+    def __eq__(self, other):
+        if((self.person1 == other.person1 and self.person2 == other.person2) or
+                (self.person1 == other.person2 and self.person2 == other.person1)):
+            return True
+        return False
+
     def __init__(self, person1, person2, date=None):
         if date is None:
             self.date = math.floor(datetime.now().timestamp() * 1000)
