@@ -27,15 +27,9 @@ def delete_user(username):
     db.session.commit()
 
 
-def disable_user(username):
-    tables.User.query.filter_by(username=username).update(
-        {'firstname': "Unknown", 'lastname': "User", 'active': False})
-    db.session.commit()
-
-
 def update_user(user):
     tables.User.query.filter_by(username=user.username).update(
-        {'active': user.active, 'firstname': user.firstname, 'lastname': user.lastname})
+        {'active': user.active, 'name': user.name})
     db.session.commit()
 
 
@@ -87,9 +81,9 @@ def get_rewards():
     return tables.Reward.query.all()
 
 
-def get_unused_rewards_by_type(reward_type):
+def get_unused_rewards_count_by_type(reward_type):
     return tables.Reward.query.filter(and_(
-        tables.Reward.reward_type == reward_type, tables.Reward.used_reward == 0)).all()
+        tables.Reward.reward_type == reward_type, tables.Reward.used_reward == 0)).count()
 
 
 def get_last_reward_type():

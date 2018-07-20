@@ -19,11 +19,11 @@ class DatabaseTester(unittest.TestCase):
         db.create_all()
         # Test users
         data = [
-            {'active': 1, 'firstname': 'per', 'lastname': 'pål', 'username': 'test1'},
-            {'active': 1, 'firstname': 'per', 'lastname': 'pål', 'username': 'test2'},
-            {'active': 1, 'firstname': 'per', 'lastname': 'pål', 'username': 'test3'},
-            {'active': 1, 'firstname': 'per', 'lastname': 'pål', 'username': 'test4'},
-            {'active': 1, 'firstname': 'per', 'lastname': 'pål', 'username': 'test5'},
+            {'active': 1, 'name': 'Per Pål', 'username': 'test1'},
+            {'active': 1, 'name': 'Per Pål', 'username': 'test2'},
+            {'active': 1, 'name': 'Per Pål', 'username': 'test3'},
+            {'active': 1, 'name': 'Per Pål', 'username': 'test4'},
+            {'active': 1, 'name': 'Per Pål', 'username': 'test5'},
         ]
         for user in data:
             self.app.post('/api/user/add', data=json.dumps(user), content_type='application/json')
@@ -36,28 +36,28 @@ class DatabaseTester(unittest.TestCase):
     def test_db_filled(self):
         # Verify that all users have been added to the db
         rv = self.app.get('/api/user/all')
-        self.assertEqual(5, len(rv.json.get('users')))
+        self.assertEqual(5, len(rv.json))
 
     def test_disable_and_update_user(self):
 
-        user = {'username': 'test2', 'firstname': 'updated', 'lastname': 'user', 'active': 0}
+        user = {'username': 'test2', 'name': 'updated', 'active': 0}
         rv = self.app.put(
-            '/api/user/update/test2', data=json.dumps(user),
+            '/api/user/update', data=json.dumps(user),
             content_type='application/json')
-        self.assertFalse(rv.json.get('active'))
+        self.assertFalse(rv.json[0].get('active'))
 
     def test_delete_user(self):
         rv = self.app.delete('/api/user/delete/test1')
         self.assertEqual(rv.json.get('message'), 'test1 deleted')
         rv = self.app.get('/api/user/all')
-        user_json = {'active': 1, 'firstname': 'per', 'lastname': 'pål', 'username': 'test1'}
-        self.assertNotIn(user_json, rv.json.get('users'))
+        user_json = {'active': 1, 'name': 'Per Pål', 'username': 'test1'}
+        self.assertNotIn(user_json, rv.json)
 
     def test_get_active_users(self):
-        data = {'firstname': 'updated', 'lastname': 'user', 'active': False}
-        self.app.put('/api/user/update/test2', data=json.dumps(data), content_type='application/json')
+        data = {'username': 'test2', 'name': 'updated', 'active': False}
+        self.app.put('/api/user/update', data=json.dumps(data), content_type='application/json')
         rv = self.app.get('/api/user/active')
-        users = rv.json.get('users')
+        users = rv.json
         usernames = []
         for user in users:
             usernames.append(user.get('username'))
@@ -72,7 +72,7 @@ class DatabaseTester(unittest.TestCase):
         self.assertEqual(pair, json_file)
 
         rv = self.app.get('/api/pair/all')
-        pairs = rv.json.get('pairs')
+        pairs = rv.json
         output = []
         for pair in pairs:
             output.append(pair.get('date'))
@@ -94,14 +94,13 @@ class DatabaseTester(unittest.TestCase):
         date = math.floor(datetime.datetime.now().timestamp() * 1000)
         reward = {'reward_type': 'pizza', 'date': date}
         self.app.post('/api/reward/add', data=json.dumps(reward), content_type='application/json')
-        print(self.app.get('/api/reward/all').json)
         rv = self.app.get('/api/pair/all/after_last_reward/pizza')
-        pairs = rv.json.get('pairs')
+        pairs = rv.json
         self.assertEqual(0, len(pairs))
         pair = {'date': date, 'person1': 'test1', 'person2': 'test3'}
         self.app.post('/api/pair/add', data=json.dumps(pair), content_type='application/json')
         rv = self.app.get('api/pair/all/after_last_reward/pizza')
-        pairs = rv.json.get('pairs')
+        pairs = rv.json
         self.assertEqual(1, len(pairs))
 
     def test_get_pair_after_date(self):
@@ -132,7 +131,7 @@ class DatabaseTester(unittest.TestCase):
         rv = self.app.get('/api/pair/at_date/get/%d' % date)
         self.assertEqual('test3', rv.json.get('person1'))
 
-    def test_get_rewards(self):
+    def test_get_reward_count(self):
         reward1 = {'reward_type': 'pizza'}
         reward2 = {'reward_type': 'cake'}
         reward3 = {'reward_type': 'pizza'}
@@ -141,12 +140,12 @@ class DatabaseTester(unittest.TestCase):
         self.app.post('/api/reward/add', data=json.dumps(reward2), content_type='application/json')
         self.app.post('/api/reward/add', data=json.dumps(reward3), content_type='application/json')
 
-        rewards = self.app.get('/api/reward/all').json.get('rewards')
+        rewards = self.app.get('/api/reward/all').json
         self.assertEqual(3, len(rewards))
-        rewards = self.app.get('api/reward/unused/pizza').json.get('rewards')
-        self.assertEqual(2, len(rewards))
-        rewards = self.app.get('api/reward/unused/cake').json.get('rewards')
-        self.assertEqual(1, len(rewards))
+        count = self.app.get('api/reward/unused/pizza').json
+        self.assertEqual(2, count)
+        count = self.app.get('api/reward/unused/cake').json
+        self.assertEqual(1, count)
 
     def test_use_reward(self):
         reward1 = {'reward_type': 'pizza'}
@@ -158,9 +157,9 @@ class DatabaseTester(unittest.TestCase):
         self.app.post('/api/reward/add', data=json.dumps(reward3), content_type='application/json')
 
         self.app.put('/api/reward/use/pizza')
-        rewards = self.app.get('/api/reward/unused/pizza').json.get('rewards')
+        count = self.app.get('/api/reward/unused/pizza').json
 
-        self.assertEqual(1, len(rewards))
+        self.assertEqual(1, count)
 
     def test_get_earliest_unused_reward(self):
         date = math.floor(datetime.datetime.now().timestamp() * 1000)
@@ -173,7 +172,7 @@ class DatabaseTester(unittest.TestCase):
         self.app.post('/api/reward/add', data=json.dumps(reward2), content_type='application/json')
         self.app.post('/api/reward/add', data=json.dumps(reward3), content_type='application/json')
 
-        reward = self.app.get('/api/reward/unused/earliest/pizza').json.get('rewards')[0]
+        reward = self.app.get('/api/reward/unused/earliest/pizza').json[0]
 
         self.assertEqual(reward['date'], date)
 
@@ -182,9 +181,9 @@ class DatabaseTester(unittest.TestCase):
         threshold2 = {'threshold': 42, 'reward_type': 'cake'}
         self.app.post('/api/threshold/add', data=json.dumps(threshold1), content_type='application/json')
         self.app.post('/api/threshold/add', data=json.dumps(threshold2), content_type='application/json')
-        threshold = self.app.get('/api/threshold/get/pizza').json.get('threshold')
+        threshold = self.app.get('/api/threshold/get/pizza').json[0].get('threshold')
         self.assertEqual(50, threshold)
-        threshold = self.app.get('/api/threshold/get/cake').json.get('threshold')
+        threshold = self.app.get('/api/threshold/get/cake').json[0].get('threshold')
         self.assertEqual(42, threshold)
 
     def test_update_threshold(self):
@@ -192,5 +191,16 @@ class DatabaseTester(unittest.TestCase):
         self.app.post('/api/threshold/add', data=json.dumps(data), content_type='application/json')
         updated_info = {'threshold': 42}
         self.app.put('/api/threshold/update/pizza', data=json.dumps(updated_info), content_type='application/json')
-        threshold = self.app.get('/api/threshold/get/pizza').json.get('threshold')
+        threshold = self.app.get('/api/threshold/get/pizza').json[0].get('threshold')
         self.assertEqual(42, threshold)
+
+    def test_wrong_input(self):
+        faulty_data = {'wrong': 'this is wrong'}
+        response = self.app.post('/api/user/add', data=json.dumps(faulty_data), content_type='application/json')
+        self.assertEqual(400, response.status_code)
+        response = self.app.post('/api/pair/add', data=json.dumps(faulty_data), content_type='application/json')
+        self.assertEqual(400, response.status_code)
+        response = self.app.post('/api/reward/add', data=json.dumps(faulty_data), content_type='application/json')
+        self.assertEqual(400, response.status_code)
+        response = self.app.post('/api/threshold/add', data=json.dumps(faulty_data), content_type='application/json')
+        self.assertEqual(400, response.status_code)

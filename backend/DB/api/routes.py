@@ -1,69 +1,70 @@
 from backend.DB.api import app, db, queries
 from flask import jsonify, request, abort
+from backend.slack import slackbot
 
 from backend.DB.api.tables import User, Pair, Reward, Threshold
+
+
+@app.route('/')
+def hello_world():
+    #pre_populate()
+    return 'Hello World'
+
+
+def format_users(users):
+    output = []
+    for user in users:
+        output.append(
+            {'username': user.username, 'name': user.name, 'image': user.image, 'active': user.active})
+    return jsonify(output)
 
 
 @app.route('/api/user/add', methods=['POST'])
 def add_user():
     r = request.get_json()
-    if not r['username'] or not r['firstname'] or not r['lastname']:
-        return jsonify({'message': 'missing information on user'})
+
+    if r is None or 'username' not in r or 'name' not in r:
+        abort(400)
+
     username = r['username']
-    firstname = r['firstname']
-    lastname = r['lastname']
-    user = User(username, firstname, lastname)
+    name = r['name']
+    user = User(username, name)
     queries.add_user(user)
-    return jsonify(
-        {'username': user.username, 'firstname': user.firstname, 'lastname': user.lastname})
+    return format_users([user])
 
 
 @app.route('/api/user/all', methods=['GET'])
 def get_all_users():
     users = queries.get_all_users()
-    output = []
-    for user in users:
-        user_data = {'username': user.username, 'firstname': user.firstname, 'lastname': user.lastname,
-                     'active': user.active}
-        output.append(user_data)
-    return jsonify({'users': output})
+    return format_users(users)
 
 
 @app.route('/api/user/active', methods=['GET'])
 def get_active_users():
     users = queries.get_active_users()
-    output = []
-    for user in users:
-        user_data = {'username': user.username, 'firstname': user.firstname, 'lastname': user.lastname,
-                     'active': user.active}
-        output.append(user_data)
-    return jsonify({'users': output})
+    return format_users(users)
 
 @app.route('/api/user/get/<username>', methods=['GET'])
 def get_user(username):
     user = queries.get_user_by_username(username)
-    return jsonify(
-        {'username': user.username,
-         'firstname': user.firstname,
-         'lastname': user.lastname,
-         'active': user.active})
+    return format_users([user])
 
 
-@app.route('/api/user/update/<username>', methods=['PUT'])
-def update_user(username):
-    user = queries.get_user_by_username(username)
+@app.route('/api/user/update', methods=['PUT'])
+def update_user():
     r = request.get_json()
-    if 'firstname' not in r or 'lastname' not in r or 'active' not in r:
-        return jsonify({'message': 'Missing information for user'})
-    user.firstname = r['firstname']
-    user.lastname = r['lastname']
+
+    if r is None or 'username' not in r or 'name' not in r or 'active' not in r:
+        abort(400)
+
+    user = queries.get_user_by_username(r['username'])
+    if user is None:
+        abort(400)
+
+    user.name = r['name']
     user.active = r['active']
     queries.update_user(user)
-    return jsonify(
-        {'username': user.username,
-         'firstname': user.firstname,
-         'lastname': user.lastname,
-         'active': user.active})
+    return format_users([user])
 
 
 @app.route('/api/user/delete/<username>', methods=['DELETE'])
@@ -84,8 +85,10 @@ def format_pairs(pairs):
 @app.route('/api/pair/add', methods=['POST'])
 def add_pair():
     r = request.get_json()
-    if not r['person1'] or not r['person2']:
-        return jsonify({'message': 'Missing information for pair'})
+
+    if r is None or 'person1' not in r or 'person2' not in r:
+        abort(400)
+
     if 'date' not in r:
         pair = Pair(r['person1'], r['person2'])
         queries.add_pair(pair)
@@ -99,7 +102,7 @@ def add_pair():
 def get_all_pairs():
     pairs = queries.get_pair_history()
     output = format_pairs(pairs)
-    return jsonify({'pairs': output})
+    return jsonify(output)
 
 
 @app.route('/api/pair/all/after_date/<date>', methods=['GET'])
@@ -117,7 +120,7 @@ def get_pairs_with_user(username):
 @app.route('/api/pair/all/after_last_reward/<reward_type>', methods=['GET'])
 def get_pairs_since_last_reward(reward_type):
     pairs = queries.get_pair_since_last_reward(reward_type)
-    return jsonify({'pairs': format_pairs(pairs)})
+    return jsonify(format_pairs(pairs))
 
 
 @app.route('/api/pair/at_date/get/<date>', methods=['GET'])
@@ -128,6 +131,10 @@ def get_pair(date):
 @app.route('/api/pair/at_date/update/<date>', methods=['PUT'])
 def update_pair(date):
     r = request.get_json()
+
+    if r is None or 'person1' not in r or 'person2' not in r:
+        abort(400)
+
     pair = [Pair(r['person1'], r['person2'], date)]
     queries.update_pair(pair[0])
     return jsonify(format_pairs(pair)[0])
@@ -136,21 +143,25 @@ def update_pair(date):
 def format_rewards(rewards):
     output = []
     for reward in rewards:
-        output.append({'reward_type': reward.reward_type, 'date': reward.date})
-    return jsonify({'rewards': output})
+        output.append({'reward_type': reward.reward_type, 'date': reward.date, 'used_reward': reward.used_reward})
+    return jsonify(output)
 
 
 @app.route('/api/reward/add', methods=['POST'])
 def add_reward():
     r = request.get_json()
-    if 'reward_type' not in r:
-        return jsonify({'message': 'Missing information for creating a reward'})
+
+    if r is None or 'reward_type' not in r:
+        abort(400)
+
     if 'date' not in r:
-        reward = Reward(r['reward_type'])
+        reward = Reward(r['reward_type'].lower())
     else:
-        reward = Reward(r['reward_type'], r['date'])
+        reward = Reward(r['reward_type'].lower(), r['date'])
+    if 'used_reward' in r:
+        reward.used_reward = r['used_reward']
     queries.add_reward(reward)
-    return jsonify({'reward_type': reward.reward_type, 'date': reward.date})
+    return format_rewards([reward])
 
 
 @app.route('/api/reward/all', methods=['GET'])
@@ -160,9 +171,9 @@ def get_all_rewards():
 
 
 @app.route('/api/reward/unused/<reward_type>', methods=['GET'])
-def get_rewards(reward_type):
-    rewards = queries.get_unused_rewards_by_type(reward_type)
-    return format_rewards(rewards)
+def get_unused_reward_count(reward_type):
+    count = queries.get_unused_rewards_count_by_type(reward_type.lower())
+    return jsonify(count)
 
 
 @app.route('/api/reward/unused/earliest/<reward_type>', methods=['GET'])
@@ -178,25 +189,46 @@ def use_reward(reward_type):
 @app.route('/api/threshold/add', methods=['POST'])
 def add_threshold():
     r = request.get_json()
-    if 'reward_type' not in r or 'threshold' not in r:
-        return jsonify({'message': 'missing information for creating a threshold'})
+
+    if r is None or 'reward_type' not in r or 'threshold' not in r:
+        abort(400)
+
     threshold = Threshold(r['reward_type'], r['threshold'])
     queries.add_threshold(threshold)
-    return jsonify({'reward_type': threshold.reward_type, 'threshold': threshold.threshold})
+    return jsonify([{'reward_type': threshold.reward_type, 'threshold': threshold.threshold}])
 
 
 @app.route('/api/threshold/get/<reward_type>', methods=['GET'])
 def get_threshold(reward_type):
     threshold = queries.get_threshold(reward_type)
-    return jsonify({'reward_type': threshold.reward_type, 'threshold': threshold.threshold})
+    if threshold is None:
+        return jsonify([])
+    return jsonify([{'reward_type': threshold.reward_type, 'threshold': threshold.threshold}])
 
 
 @app.route('/api/threshold/update/<reward_type>', methods=['PUT'])
 def update_threshold(reward_type):
     r = request.get_json()
-    if 'threshold' not in r:
-        return jsonify({'message': 'You need to specify a threshold'})
+
+    if r is None or 'threshold' not in r:
+        abort(400)
+
     threshold = queries.get_threshold(reward_type)
     threshold.threshold = r['threshold']
     queries.update_threshold(threshold)
     return jsonify({'reward_type': threshold.reward_type, 'threshold': threshold.threshold})
+
+
+def pre_populate():
+    #persons = slackbot.get_persons_from_slack()
+    #for person in persons:
+    #    queries.add_user(User(person['username'], person['name'], person['image']))
+    threshold1 = Threshold('pizza', 50)
+    threshold2 = Threshold('cake', 42)
+    queries.add_threshold(threshold1)
+    queries.add_threshold(threshold2)
+
+if __name__ == '__main__':
+    db.create_all()
+    db.init_app(app)
+    app.run(host='0.0.0.0', port=app.config.get("PORT", 5000))

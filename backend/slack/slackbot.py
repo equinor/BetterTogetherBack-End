@@ -25,9 +25,9 @@ def get_persons_from_slack():
 
 
 def write_to_json(data):
-    with open("../jsonUserList.json", 'w') as outfile:
+    with open("../backend/json/jsonUserList.json", 'w') as outfile:
         json.dump(data, outfile, indent=2, sort_keys=True)
         outfile.close()
 
 
-write_to_json(get_persons_from_slack())
+#write_to_json(get_persons_from_slack())
