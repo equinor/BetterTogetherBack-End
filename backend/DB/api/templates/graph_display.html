@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<meta charset='utf-8'>
+
+<head>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <link rel="icon" href="../static/equinor.png">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/graph_display.css">
+    <title>Pair Programming Display</title>
+
+</head>
+
+<body>
+<div id="bs-override">Pair programming SIB</div>
+
+<div class = "row">
+
+<div class ="col-9" id='content'>
+    <svg width="1500" height="750">
+        <defs id="patterns_svg"></defs>
+        <g id="links"></g>
+        <g id="circles"></g>
+    </svg>
+</div>
+
+
+<div class="col-3" id="status_bar">
+<div class="container" style="width: 100%;">
+    <div class="panel panel-default">
+      <h4>Cake progress</h4>
+      <div class="progress">
+        <div class="progress-bar progress-bar-danger" id="cake" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+        </div>
+      </div>
+        <h4>Pizza progress</h4>
+      <div class="progress">
+        <div class="progress-bar progress-bar-danger" id="pizza" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+        </div>
+      </div>
+    </div>
+</div>
+</div>
+</div>
+
+<script src='../static/graph_display.js'></script>
+
+</body>
+</html>
