@@ -8,11 +8,6 @@ d3.json("api/user/all", (users) => {
 
         d3.json("status/data", (status) => {
 
-            let cake = 20, pizza = 40;
-            let cake_thres = 30, pizza_thres = 70;
-            let cake_claim = 2, pizza_claim = 1;
-
-            console.log(status);
 
             let user_indices = {};
             users.forEach((v, i) => user_indices[v.username] = i);
@@ -28,10 +23,17 @@ d3.json("api/user/all", (users) => {
                 .attr("aria-valuemax", status.cake_thres)
                 .text(status.cake_count.toString() + "/" + status.cake_thres.toString());
 
+
             let setPizzaProgress = d3.select('#pizza')
                 .attr('style', "width:" + status.pizza_count / status.pizza_thres * 100 + "%")
                 .attr("aria-valuemax", status.pizza_thres)
                 .text(status.pizza_count.toString() + "/" + status.pizza_thres.toString());
+
+            let setClaimable = d3. select('#status_bar')
+                .append("div")
+                .text("Claimable cake: "+ status['unused_cake'] +
+                    " Claimable pizza: "+ status['unused_pizza']);
+
 
             //Add patterns to images
             let defs = d3.select('#patterns_svg')
@@ -39,9 +41,7 @@ d3.json("api/user/all", (users) => {
                 .data(users)
                 .enter()
                 .append('pattern')
-                .attr('id', function (d) {
-                    return d.username
-                })
+                .attr('id', (d) => d.username)
                 .attr('height', "100%")
                 .attr('width', "100%")
                 .attr('patternContentUnits', 'objectBoundingBox')
@@ -49,13 +49,14 @@ d3.json("api/user/all", (users) => {
                 .attr('height', 1)
                 .attr('width', 1)
                 .attr('preserveAspectRatio', 'none')
-                .attr('href', function (d) {
+                .attr('href', (d) => {
                     if (d.image === "unknown") {
                         return "../static/default.png"
                     } else {
                         return d.image
                     }
                 });
+
 
             //Add nodes to <class>-es
             let node = d3.select('#circles')
@@ -64,9 +65,7 @@ d3.json("api/user/all", (users) => {
                 .enter().append('circle')
                 .attr('class', 'user_node')
                 .attr('r', radius)
-                .attr('fill', function (d) {
-                    return 'url(#' + d.username + ')'
-                });
+                .attr('fill', (d) => ('url(#' + d.username + ')'));
 
 
             let simulation = d3.forceSimulation(users)
@@ -114,7 +113,7 @@ d3.json("api/user/all", (users) => {
                     .append('line')
                     .merge(class_link)
                     .attr('stroke-width', (d) => d.total)
-                    .attr('stroke', function (d) {
+                    .attr('stroke', (d) => {
                         if (d.source.username === status.last_pair[0] && d.target.username === status.last_pair[1]) {
                             return 'red'
                         } else {
@@ -134,15 +133,11 @@ d3.json("api/user/all", (users) => {
                     .append('circle')
                     .attr('r', radius)
                     .merge(node)
-                    .attr('cx', function (d) {
-                        return d.x = Math.max(radius, Math.min(width - radius, d.x));
-                    })
-                    .attr('cy', function (d) {
-                        return d.y = Math.max(radius, Math.min(height - radius, d.y));
-                    })
+                    .attr('cx', (d) => d.x = Math.max(radius, Math.min(width - radius, d.x)))
+                    .attr('cy', (d) => d.y = Math.max(radius, Math.min(height - radius, d.y)))
                     .on('mouseover', handleMouseOver)
                     .on('mouseout', handleMouseOut);
-                node.exit().remove()
+                node.exit().remove();
             }
 
             function ticked() {
@@ -156,15 +151,9 @@ d3.json("api/user/all", (users) => {
 
                 d3.select('svg').append('text')
                     .attr('id', 'object_selected')
-                    .attr('x', function () {
-                        return d.x + radius * 1.3;
-                    })
-                    .attr('y', function () {
-                        return d.y - height / 35;
-                    })
-                    .text(function () {
-                        return d.name;
-                    });
+                    .attr('x', () => d.x + radius * 1.3)
+                    .attr('y', () => d.y - height / 35)
+                    .text(() => d.name);
             }
 
             function handleMouseOut(d, i) {
