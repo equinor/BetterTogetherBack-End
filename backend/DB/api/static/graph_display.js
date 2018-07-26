@@ -6,7 +6,7 @@ d3.json("api/user/all?token=TEST", (users) => {
 
     d3.json("api/pair/count_pair?token=TEST", (edge_users) => {
 
-        d3.json("status/data=token=TEST", (status) => {
+        d3.json("status/data?token=TEST", (status) => {
 
 
             let user_indices = {};
@@ -51,9 +51,9 @@ d3.json("api/user/all?token=TEST", (users) => {
                 .attr('preserveAspectRatio', 'none')
                 .attr('href', (d) => {
                     if (d.image === "unknown") {
-                        return "../static/default.png/?token=TEST"
+                        return "../static/images/default.png/?token=TEST"
                     } else {
-                        return "../static/"+ d.username + ".png/?token=TEST"
+                        return "../static/images/"+ d.username + ".png/?token=TEST"
                     }
                 });
 
