@@ -2,11 +2,11 @@ let width = 1500, height = 750;
 
 let radius = width / 50;
 
-d3.json("api/user/all", (users) => {
+d3.json("api/user/all?token=TEST", (users) => {
 
-    d3.json("api/pair/count_pair", (edge_users) => {
+    d3.json("api/pair/count_pair?token=TEST", (edge_users) => {
 
-        d3.json("status/data", (status) => {
+        d3.json("status/data=token=TEST", (status) => {
 
 
             let user_indices = {};
@@ -51,9 +51,9 @@ d3.json("api/user/all", (users) => {
                 .attr('preserveAspectRatio', 'none')
                 .attr('href', (d) => {
                     if (d.image === "unknown") {
-                        return "../static/default.png"
+                        return "../static/default.png/?token=TEST"
                     } else {
-                        return d.image
+                        return "../static/"+ d.username + ".png/?token=TEST"
                     }
                 });
 
