@@ -1,4 +1,4 @@
-from sqlalchemy import func, or_, and_
+from sqlalchemy import or_, and_
 from backend.DB.api import db
 from backend.DB.api import tables
 from sqlalchemy.exc import IntegrityError

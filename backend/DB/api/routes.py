@@ -25,7 +25,8 @@ def status_data():
                      "cake_thres": queries.get_threshold("cake").threshold,
                      "unused_cake": queries.get_unused_rewards_count_by_type("cake"),
                      "unused_pizza": queries.get_unused_rewards_count_by_type("pizza"),
-                     "last_pair": ["esog", "mleik"]})
+                     "last_pair": [queries.get_pair_history()[-1].person1,
+                                   queries.get_pair_history()[-1].person2]})
 
 
 @app.route('/api/user/add', methods=['POST'])
