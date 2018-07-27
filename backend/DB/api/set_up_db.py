@@ -12,17 +12,5 @@ for person in persons:
 threshold1 = Threshold('pizza', 50)
 threshold2 = Threshold('cake', 42)
 
-queries.add_pair(Pair('mleik', 'ohald'))
-queries.add_pair(Pair('ohald', 'mleik'))
-queries.add_pair(Pair('esog', 'ohald'))
-queries.add_pair(Pair('esog', 'ohald'))
-queries.add_pair(Pair('esog', 'mleik'))
-queries.add_pair(Pair('mleik', 'ohald'))
-queries.add_pair(Pair('ohald', 'mleik'))
-queries.add_pair(Pair('esog', 'ohald'))
-queries.add_pair(Pair('esog', 'ohald'))
-queries.add_pair(Pair('esog', 'mleik'))
-
-
 queries.add_threshold(threshold1)
 queries.add_threshold(threshold2)
