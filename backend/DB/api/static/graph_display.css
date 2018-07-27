@@ -6,7 +6,7 @@ body{
 #bs-override {
     font-family: serif;
     font-weight: bold;
-    color: red;
+    color: #ff1243;
     text-align: center;
     font-size: 25px;
 }
@@ -14,41 +14,7 @@ body{
 h4 {
     font-family: serif;
     font-weight: bold;
-    color: #ff6c60;
+    color: #ff1243;
     text-align: center;
     font-size: 15px;
 }
-
-/*
-#pos_container {
-  position:absolute;
-  top: 5%;
-  left: 25%;
-  flex-wrap: wrap;
-  border:1px solid black;
-  padding:0px;
-}
-
-#pos_container > div{
-  float:left;
-  margin:10px;
-}
-
-
-#content {
-    flex-wrap: wrap-reverse;
-    border:1px solid black;
-}
-
-#status_bar {
-    flex-wrap: wrap-reverse;
-    border:1px solid black;
-}
-
-
-line {
-    stroke: black;
-}
-*/
-
-

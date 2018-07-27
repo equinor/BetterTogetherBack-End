@@ -1,12 +1,17 @@
+import os
+import ssl
+import urllib
+
 from slackclient import SlackClient
 import json
 
 
 def get_persons_from_slack():
     persons = []
+    context = ssl._create_unverified_context()
 
-    client = SlackClient("INSERT_TOKEN_HERE")
-    request = client.api_call("conversations.members", channel="INSERT_CHANNEL_ID_HERE")
+    client = SlackClient(os.environ['SLACK_TOKEN'])
+    request = client.api_call("conversations.members", channel=os.environ['SLACK_CHANNEL'])
     if request['ok']:
         for member in request['members']:
             person = dict()
@@ -15,7 +20,11 @@ def get_persons_from_slack():
             if 'image_1024' not in profile.keys():
                 person['image'] = "unknown"
             else:
-                person['image'] = profile['image_1024']
+                img = urllib.request.urlopen(profile['image_1024'], context=context).read()
+                person['image'] = str(img)
+                filename = person['username']+'.png'
+                with open(os.path.join('../api/static/images', filename), 'wb') as f:
+                    f.write(img)
             person['name'] = profile['real_name']
             persons.append(person)
     else:
@@ -28,6 +37,3 @@ def write_to_json(data):
     with open("../backend/json/jsonUserList.json", 'w') as outfile:
         json.dump(data, outfile, indent=2, sort_keys=True)
         outfile.close()
-
-
-#write_to_json(get_persons_from_slack())
