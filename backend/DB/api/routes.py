@@ -1,7 +1,16 @@
-from backend.DB.api import app, db, queries
+from backend.DB.api import app, queries
 from flask import jsonify, request, abort, render_template
 
 from backend.DB.api.tables import User, Pair, Reward, Threshold
+
+
+@app.before_request
+def verify_token():
+    token = request.args.get('token')
+    if token is None:
+        abort(403)
+    if token != app.config['SECRET_KEY']:
+        abort(403)
 
 
 @app.route('/')
