@@ -6,7 +6,8 @@ from backend.DB.api.tables import User, Pair, Reward, Threshold
 
 @app.route('/')
 def graph_display():
-    return render_template('graph_display.html')
+    token = request.args.get('token')
+    return render_template('graph_display.html', token=token)
 
 
 def format_users(users):
