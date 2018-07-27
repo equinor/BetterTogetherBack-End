@@ -29,15 +29,18 @@ def format_users(users):
 
 @app.route('/status/data')
 def status_data():
-    last_pair = queries.get_pair_history()[-1]
-    return jsonify({"cake_count": len(queries.get_pair_since_last_reward("cake")),
-                     "pizza_count": len(queries.get_pair_since_last_reward("pizza")),
-                     "pizza_thres": queries.get_threshold("pizza").threshold,
-                     "cake_thres": queries.get_threshold("cake").threshold,
-                     "unused_cake": queries.get_unused_rewards_count_by_type("cake"),
-                     "unused_pizza": queries.get_unused_rewards_count_by_type("pizza"),
-                     "last_pair": [last_pair.person1,
-                                   last_pair.person2]})
+    status = {"cake_count": len(queries.get_pair_since_last_reward("cake")),
+              "pizza_count": len(queries.get_pair_since_last_reward("pizza")),
+              "pizza_thres": queries.get_threshold("pizza").threshold,
+              "cake_thres": queries.get_threshold("cake").threshold,
+              "unused_cake": queries.get_unused_rewards_count_by_type("cake"),
+              "unused_pizza": queries.get_unused_rewards_count_by_type("pizza"),
+              }
+    pairs = queries.get_pair_history()
+    if len(pairs) > 0:
+        last_pair = pairs[-1]
+        status['last_pair'] = [last_pair.person1, last_pair.person2]
+    return jsonify(status)
 
 
 @app.route('/api/user/add', methods=['POST'])
