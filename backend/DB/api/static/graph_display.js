@@ -2,7 +2,9 @@ let width = 1500, height = 750;
 
 let radius = width / 50;
 
-let token ="TEST";
+let token = document.location.href.split('=')[1];
+console.log(token);
+
 
 d3.json("api/user/all?token="+token, (users) => {
 
