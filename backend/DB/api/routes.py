@@ -27,7 +27,7 @@ def format_users(users):
     return jsonify(output)
 
 
-@app.route('/status/data')
+@app.route('/api/reward/progress')
 def status_data():
     status = {"cake_count": len(queries.get_pairs_since_last_reward("cake")),
               "pizza_count": len(queries.get_pairs_since_last_reward("pizza")),
