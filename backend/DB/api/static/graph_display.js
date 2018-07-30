@@ -54,9 +54,9 @@ d3.json("api/user/all?token="+token, (users) => {
                 .attr('preserveAspectRatio', 'none')
                 .attr('href', (d) => {
                     if (d.image === "unknown") {
-                        return "../static/images/default.png/?token="+token
+                        return "../static/images/default.png/?token="+token;
                     } else {
-                        return "../static/images/"+ d.username + ".png/?token="+token
+                        return "../static/images/"+ d.username + ".png/?token="+token;
                     }
                 });
 
@@ -118,9 +118,9 @@ d3.json("api/user/all?token="+token, (users) => {
                     .attr('stroke-width', (d) => d.total)
                     .attr('stroke', (d) => {
                         if (d.source.username === status.last_pair[0] && d.target.username === status.last_pair[1]) {
-                            return 'red'
+                            return 'red';
                         } else {
-                            return 'black'
+                            return 'black';
                         }
                     })
                     .attr('x1', (d) => d.source.x)
