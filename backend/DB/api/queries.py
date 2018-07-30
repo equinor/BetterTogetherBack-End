@@ -50,7 +50,7 @@ def get_pair_history():
     return tables.Pair.query.all()
 
 
-def get_pair_since_last_reward(reward_type):
+def get_pairs_since_last_reward(reward_type):
     reward_date = db.session.query(
         db.func.max(tables.Reward.date)).filter_by(reward_type=reward_type).first()
     if reward_date[0] is None:
@@ -59,7 +59,7 @@ def get_pair_since_last_reward(reward_type):
         return tables.Pair.query.filter(tables.Pair.date >= reward_date[0]).all()
 
 
-def get_pairs_with_user(username):
+def get_pairs_containing_user(username):
     return db.session.query(tables.Pair).filter(
         or_(tables.Pair.person1 == username, tables.Pair.person2 == username)).all()
 
@@ -72,7 +72,7 @@ def get_pair(date):
     return tables.Pair.query.filter_by(date=date).first()
 
 
-def get_pair_count_between_all_users():
+def get_pair_counts_between_all_users():
     pairs = db.session.query(tables.Pair.person1, tables.Pair.person2, db.func.count(
         tables.Pair.person1)).group_by(tables.Pair.person1, tables.Pair.person2).all()
     counters = []
@@ -85,11 +85,6 @@ def get_pair_count_between_all_users():
         if should_add_pair:
             counters.append({'source': pair[0], 'target': pair[1], 'total': pair[2]})
     return counters
-
-
-
-
-
 
 
 def update_pair(pair):

@@ -1,6 +1,7 @@
+import time
+
 from sqlalchemy import ForeignKey
 import math
-from datetime import datetime
 
 from sqlalchemy.orm import relationship
 
@@ -37,14 +38,14 @@ class Pair(db.Model):
     user2 = relationship("User", cascade="all,delete", foreign_keys=[person2])
 
     def __eq__(self, other):
-        if((self.person1 == other.person1 and self.person2 == other.person2) or
-                (self.person1 == other.person2 and self.person2 == other.person1)):
-            return True
-        return False
+        return ((self.person1 == other.person1 and self.person2 == other.person2) or
+                (self.person1 == other.person2 and self.person2 == other.person1))
 
     def __init__(self, person1, person2, date=None):
         if date is None:
-            self.date = math.floor(datetime.now().timestamp() * 1000)
+            # Pair class requires integer date, not float.
+            # Use ms not s to round off to avoid conflicts on primary key
+            self.date = math.floor(time.time() * 1000)
         else:
             self.date = date
         self.person1 = person1
@@ -67,7 +68,9 @@ class Reward(db.Model):
 
     def __init__(self, reward_type, date=None):
         if not date:
-            self.date = math.floor(datetime.now().timestamp() * 1000)
+            # Pair class requires integer date, not float.
+            # Use ms not s to round off to avoid conflicts on primary key
+            self.date = math.floor(time.time() * 1000)
         else:
             self.date = date
         self.reward_type = reward_type

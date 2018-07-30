@@ -1,12 +1,12 @@
 import datetime
 import json
 import math
+import time
 import unittest
 
 from backend.DB.api import app, db
 
 from backend.DB.api import routes, tables
-
 
 token = "?token=TEST"
 
@@ -30,6 +30,13 @@ class DatabaseTester(unittest.TestCase):
         ]
         for user in data:
             self.app.post('/api/user/add{}'.format(token), data=json.dumps(user), content_type='application/json')
+        thresholds = [
+            {'threshold': 52, 'reward_type': 'pizza'},
+            {'threshold': 40, 'reward_type': 'cake'}
+        ]
+        for threshold in thresholds:
+            self.app.post('/api/threshold/add{}'.format(token), data=json.dumps(threshold),
+                          content_type='application/json')
 
     def tearDown(self):
         # Empty db after each test
@@ -40,6 +47,10 @@ class DatabaseTester(unittest.TestCase):
         # Verify that all users have been added to the db
         rv = self.app.get('/api/user/all{}'.format(token))
         self.assertEqual(5, len(rv.json))
+        thres = self.app.get('api/threshold/get/cake{}'.format(token))
+        self.assertEqual(40, thres.json[0]['threshold'])
+        thres = self.app.get('api/threshold/get/pizza{}'.format(token))
+        self.assertEqual(52, thres.json[0]['threshold'])
 
     def test_disable_and_update_user(self):
 
@@ -178,7 +189,7 @@ class DatabaseTester(unittest.TestCase):
         self.assertEqual(1, count)
 
     def test_get_earliest_unused_reward(self):
-        date = math.floor(datetime.datetime.now().timestamp() * 1000)
+        date = math.floor(time.time() * 1000)
 
         reward1 = {'reward_type': 'pizza', 'date': date}
         reward2 = {'reward_type': 'cake'}
@@ -192,19 +203,15 @@ class DatabaseTester(unittest.TestCase):
 
         self.assertEqual(reward['date'], date)
 
-    def test_add_and_get_threshold(self):
-        threshold1 = {'threshold': 50, 'reward_type': 'pizza'}
-        threshold2 = {'threshold': 42, 'reward_type': 'cake'}
-        self.app.post('/api/threshold/add{}'.format(token), data=json.dumps(threshold1), content_type='application/json')
-        self.app.post('/api/threshold/add{}'.format(token), data=json.dumps(threshold2), content_type='application/json')
-        threshold = self.app.get('/api/threshold/get/pizza{}'.format(token)).json[0].get('threshold')
-        self.assertEqual(50, threshold)
-        threshold = self.app.get('/api/threshold/get/cake{}'.format(token)).json[0].get('threshold')
-        self.assertEqual(42, threshold)
+    def test_reward_progress(self):
+        result = self.app.get('/api/reward/progress{}'.format(token), content_type='application/json').json
+        self.assertNotIn('last_pair', result.keys())
+        pair = {'person1': 'test1', 'person2': 'test2'}
+        self.app.post('api/pair/add{}'.format(token), data=json.dumps(pair), content_type='application/json')
+        result = self.app.get('/api/reward/progress{}'.format(token), content_type='application/json').json
+        self.assertIn('last_pair', result.keys())
 
     def test_update_threshold(self):
-        data = {'threshold': 50, 'reward_type': 'pizza'}
-        self.app.post('/api/threshold/add{}'.format(token), data=json.dumps(data), content_type='application/json')
         updated_info = {'threshold': 42}
         self.app.put('/api/threshold/update/pizza{}'.format(token),
                      data=json.dumps(updated_info), content_type='application/json')
