@@ -1,5 +1,7 @@
-*.sqlite3
-.idea/
 *.pyc
 */__pycache__/
 *.png
+better_together_db.sqlite3
+bettertogether.sh
+.idea/
+__pycache__/
