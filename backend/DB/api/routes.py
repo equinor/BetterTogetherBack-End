@@ -29,8 +29,8 @@ def format_users(users):
 
 @app.route('/status/data')
 def status_data():
-    status = {"cake_count": len(queries.get_pair_since_last_reward("cake")),
-              "pizza_count": len(queries.get_pair_since_last_reward("pizza")),
+    status = {"cake_count": len(queries.get_pairs_since_last_reward("cake")),
+              "pizza_count": len(queries.get_pairs_since_last_reward("pizza")),
               "pizza_thres": queries.get_threshold("pizza").threshold,
               "cake_thres": queries.get_threshold("cake").threshold,
               "unused_cake": queries.get_unused_rewards_count_by_type("cake"),
@@ -138,19 +138,19 @@ def get_pairs_since_date(date):
 
 @app.route('/api/pair/with_user/<username>', methods=['GET'])
 def get_pairs_with_user(username):
-    pairs = queries.get_pairs_with_user(username)
+    pairs = queries.get_pairs_containing_user(username)
     return jsonify({'pairs': format_pairs(pairs)})
 
 
 @app.route('/api/pair/all/after_last_reward/<reward_type>', methods=['GET'])
 def get_pairs_since_last_reward(reward_type):
-    pairs = queries.get_pair_since_last_reward(reward_type)
+    pairs = queries.get_pairs_since_last_reward(reward_type)
     return jsonify(format_pairs(pairs))
 
 
 @app.route('/api/pair/count_pair', methods=['GET'])
 def get_pair_count_between_all_users():
-    counters = queries.get_pair_count_between_all_users()
+    counters = queries.get_pair_counts_between_all_users()
     return jsonify(counters)
 
 
