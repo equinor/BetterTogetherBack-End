@@ -1,6 +1,7 @@
 import os
 import ssl
 import urllib
+import base64
 
 from slackclient import SlackClient
 import json
@@ -21,7 +22,7 @@ def get_persons_from_slack():
                 person['image'] = "unknown"
             else:
                 img = urllib.request.urlopen(profile['image_1024'], context=context).read()
-                person['image'] = str(img)
+                person['image'] = str(base64.b64encode(img))[2:]
                 filename = person['username']+'.png'
                 with open(os.path.join('../api/static/images', filename), 'wb') as f:
                     f.write(img)
