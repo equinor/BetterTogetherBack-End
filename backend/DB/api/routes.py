@@ -23,7 +23,8 @@ def format_users(users):
     output = []
     for user in users:
         output.append(
-            {'username': user.username, 'name': user.name, 'image': user.image, 'active': user.active})
+            {'username': user.username, 'name': user.name,
+             'image': user.image, 'active': user.active})
     return jsonify(output)
 
 
@@ -45,13 +46,15 @@ def status_data():
 
 @app.route('/api/user/add', methods=['POST'])
 def add_user():
-    r = request.get_json()
+    user_json = request.get_json()
 
-    if r is None or 'username' not in r or 'name' not in r:
+    if user_json is None:
+        abort(400)
+    if all(k not in user_json.keys() for k in ('username', 'name')):
         abort(400)
 
-    username = r['username']
-    name = r['name']
+    username = user_json['username']
+    name = user_json['name']
     user = User(username, name)
     queries.add_user(user)
     return format_users([user])
@@ -77,17 +80,19 @@ def get_user(username):
 
 @app.route('/api/user/update', methods=['PUT'])
 def update_user():
-    r = request.get_json()
+    user_json = request.get_json()
 
-    if r is None or 'username' not in r or 'name' not in r or 'active' not in r:
+    if user_json is None:
+        abort(400)
+    if all(k not in user_json.keys() for k in ('username', 'name', 'active')):
         abort(400)
 
-    user = queries.get_user_by_username(r['username'])
+    user = queries.get_user_by_username(user_json['username'])
     if user is None:
         abort(400)
 
-    user.name = r['name']
-    user.active = r['active']
+    user.name = user_json['name']
+    user.active = user_json['active']
     queries.update_user(user)
     return format_users([user])
 
@@ -109,16 +114,18 @@ def format_pairs(pairs):
 
 @app.route('/api/pair/add', methods=['POST'])
 def add_pair():
-    r = request.get_json()
+    pair_json = request.get_json()
 
-    if r is None or 'person1' not in r or 'person2' not in r:
+    if pair_json is None:
+        abort(400)
+    if all(k not in pair_json.keys() for k in ('person1', 'person2')):
         abort(400)
 
-    if 'date' not in r:
-        pair = Pair(r['person1'], r['person2'])
+    if 'date' not in pair_json:
+        pair = Pair(pair_json['person1'], pair_json['person2'])
         queries.add_pair(pair)
         return jsonify({'person1': pair.person1, 'person2': pair.person2, 'date': pair.date})
-    pair = Pair(r['person1'], r['person2'], r['date'])
+    pair = Pair(pair_json['person1'], pair_json['person2'], pair_json['date'])
     queries.add_pair(pair)
     return jsonify(format_pairs([pair])[0])
 
@@ -161,12 +168,14 @@ def get_pair(date):
 
 @app.route('/api/pair/at_date/update/<date>', methods=['PUT'])
 def update_pair(date):
-    r = request.get_json()
+    pair_json = request.get_json()
 
-    if r is None or 'person1' not in r or 'person2' not in r:
+    if pair_json is None:
+        abort(400)
+    if all(k not in pair_json.keys() for k in ('person1', 'person2')):
         abort(400)
 
-    pair = [Pair(r['person1'], r['person2'], date)]
+    pair = [Pair(pair_json['person1'], pair_json['person2'], date)]
     queries.update_pair(pair[0])
     return jsonify(format_pairs(pair)[0])
 
@@ -174,23 +183,24 @@ def update_pair(date):
 def format_rewards(rewards):
     output = []
     for reward in rewards:
-        output.append({'reward_type': reward.reward_type, 'date': reward.date, 'used_reward': reward.used_reward})
+        output.append({'reward_type': reward.reward_type,
+                       'date': reward.date, 'used_reward': reward.used_reward})
     return jsonify(output)
 
 
 @app.route('/api/reward/add', methods=['POST'])
 def add_reward():
-    r = request.get_json()
+    reward_json = request.get_json()
 
-    if r is None or 'reward_type' not in r:
+    if reward_json is None or 'reward_type' not in reward_json:
         abort(400)
 
-    if 'date' not in r:
-        reward = Reward(r['reward_type'].lower())
+    if 'date' not in reward_json:
+        reward = Reward(reward_json['reward_type'].lower())
     else:
-        reward = Reward(r['reward_type'].lower(), r['date'])
-    if 'used_reward' in r:
-        reward.used_reward = r['used_reward']
+        reward = Reward(reward_json['reward_type'].lower(), reward_json['date'])
+    if 'used_reward' in reward_json:
+        reward.used_reward = reward_json['used_reward']
     queries.add_reward(reward)
     return format_rewards([reward])
 
@@ -219,12 +229,14 @@ def use_reward(reward_type):
 
 @app.route('/api/threshold/add', methods=['POST'])
 def add_threshold():
-    r = request.get_json()
+    thres_json = request.get_json()
 
-    if r is None or 'reward_type' not in r or 'threshold' not in r:
+    if thres_json is None:
+        abort(400)
+    if all(k not in thres_json.keys() for k in ('reward_type', 'threshold')):
         abort(400)
 
-    threshold = Threshold(r['reward_type'], r['threshold'])
+    threshold = Threshold(thres_json['reward_type'], thres_json['threshold'])
     queries.add_threshold(threshold)
     return jsonify([{'reward_type': threshold.reward_type, 'threshold': threshold.threshold}])
 
@@ -239,13 +251,13 @@ def get_threshold(reward_type):
 
 @app.route('/api/threshold/update/<reward_type>', methods=['PUT'])
 def update_threshold(reward_type):
-    r = request.get_json()
+    thres_json = request.get_json()
 
-    if r is None or 'threshold' not in r:
+    if thres_json is None or 'threshold' not in thres_json:
         abort(400)
 
     threshold = queries.get_threshold(reward_type)
-    threshold.threshold = r['threshold']
+    threshold.threshold = thres_json['threshold']
     queries.update_threshold(threshold)
     return jsonify({'reward_type': threshold.reward_type, 'threshold': threshold.threshold})
 
