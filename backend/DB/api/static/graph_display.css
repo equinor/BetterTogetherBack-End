@@ -93,7 +93,7 @@ h4 {
 
 @font-face {
     font-family: "Noto Emoji Regular";
-    src: url('fonts/NotoColorEmoji.ttf') format('truetype');
+    src: url('https://fontlibrary.org/face/noto-emoji') format('truetype');
 }
 
 .achievement-emoji {
