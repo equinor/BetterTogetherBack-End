@@ -110,8 +110,11 @@ def update_user():
 @app.route('/api/user/delete/<username>', methods=['DELETE'])
 def delete_user(username):
     user = queries.get_user_by_username(username)
-    queries.delete_user(user.username)
-    return jsonify({'message': user.username + ' deleted'})
+    if user is None:
+        abort(400)
+    if queries.delete_user(user.username):
+        return jsonify({'message': user.username + ' deleted'})
+    abort(400)
 
 
 def format_pairs(pairs):

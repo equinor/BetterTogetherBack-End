@@ -233,6 +233,8 @@ class DatabaseTester(unittest.TestCase):
         response = self.app.post('/api/threshold/add{}'.format(token),
                                  data=json.dumps(faulty_data), content_type='application/json')
         self.assertEqual(400, response.status_code)
+        response = self.app.delete('/api/user/delete/not_a_username{}'.format(token))
+        self.assertEqual(400, response.status_code)
 
     def test_wrong_token(self):
         response = self.app.get('/api/user/all?token=wrong_token')

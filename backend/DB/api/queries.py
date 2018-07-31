@@ -29,6 +29,8 @@ def delete_user(username):
     user = tables.User.query.filter_by(username=username).first()
     db.session.delete(user)
     db.session.commit()
+    deleted_user = tables.User.query.filter_by(username=username).first()
+    return deleted_user is None
 
 
 def update_user(user):
