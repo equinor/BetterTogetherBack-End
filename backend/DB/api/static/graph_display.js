@@ -20,15 +20,31 @@ d3.json("api/user/all?token="+token, (users) => {
                 'total': v.total,
             }));
 
+            let cake_percent = (status.cake_count/status.cake_thres) * 100;
+            let pizza_percent = (status.pizza_count/status.pizza_thres) * 100;
+
+
+            let set_progress = d3.select('#progress-bar-percentage')
+                .attr('style', "width:" + cake_percent + "%")
+                .attr('class', () => {
+                    if (cake_percent === 100) {
+                        return 'all-rounded green-blink';
+                    } else {
+                        return 'all-rounded';
+                    }
+                })
+                .append('span')
+                .text(status.cake_count + "/" + status.cake_thres);
+            /*
 
             let setCakeProgress = d3.select('#cake')
-                .attr('style', "width:" + status.cake_count / status.cake_thres * 100 + "%")
+                .attr('style', "width:" + cake_percent + "%")
                 .attr("aria-valuemax", status.cake_thres)
                 .text(status.cake_count.toString() + "/" + status.cake_thres.toString());
 
 
             let setPizzaProgress = d3.select('#pizza')
-                .attr('style', "width:" + status.pizza_count / status.pizza_thres * 100 + "%")
+                .attr('style', "width:" + pizza_percent + "%")
                 .attr("aria-valuemax", status.pizza_thres)
                 .text(status.pizza_count.toString() + "/" + status.pizza_thres.toString());
 
@@ -36,7 +52,7 @@ d3.json("api/user/all?token="+token, (users) => {
                 .append("div")
                 .text("Claimable cake: "+ status['unused_cake'] +
                     " Claimable pizza: "+ status['unused_pizza']);
-
+        */
 
             //Add patterns to images
             let defs = d3.select('#patterns_svg')
