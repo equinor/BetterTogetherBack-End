@@ -9,7 +9,7 @@ with open('requirements.txt', 'r') as f:
 setup(
     name='BetterTogetherBack-End',
     packages=[
-        'backend',
+        'backend/DB/api',
     ],
     author='Software Innovation Bergen, Summer Students',
     description="Back end for BetterTogether",

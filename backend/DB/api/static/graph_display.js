@@ -9,7 +9,7 @@ d3.json("api/user/all?token="+token, (users) => {
 
     d3.json("api/pair/count_pair?token="+token, (edge_users) => {
 
-        d3.json("reward/progress?token="+token, (status) => {
+        d3.json("api/reward/progress?token="+token, (status) => {
 
 
             let user_indices = {};
