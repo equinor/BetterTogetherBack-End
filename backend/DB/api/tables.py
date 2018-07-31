@@ -25,6 +25,8 @@ class User(db.Model):
     name = db.Column('name', db.String)
     active = db.Column('active', db.Integer)
     image = db.Column('image', db.String)
+    first = relationship('Pair', backref='first', foreign_keys='Pair.person1')
+    second = relationship('Pair', backref='second', foreign_keys='Pair.person2')
 
     def __init__(self, username, name, image='unknown'):
         self.username = username
@@ -35,10 +37,8 @@ class User(db.Model):
 
 class Pair(db.Model):
     date = db.Column(db.Integer, primary_key=True)
-    person1 = db.Column(db.String, ForeignKey(User.username))
-    person2 = db.Column(db.String, ForeignKey(User.username))
-    user1 = relationship("User", cascade="all,delete", foreign_keys=[person1])
-    user2 = relationship("User", cascade="all,delete", foreign_keys=[person2])
+    person1 = db.Column(db.String, ForeignKey('user.user_name'), nullable=True)
+    person2 = db.Column(db.String, ForeignKey('user.user_name'), nullable=True)
 
     def __eq__(self, other):
         return ((self.person1 == other.person1 and self.person2 == other.person2) or

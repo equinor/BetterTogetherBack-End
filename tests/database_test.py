@@ -62,11 +62,17 @@ class DatabaseTester(unittest.TestCase):
         self.assertFalse(rv.json[0].get('active'))
 
     def test_delete_user(self):
-        rv = self.app.delete('/api/user/delete/test1{}'.format(token))
-        self.assertEqual(rv.json.get('message'), 'test1 deleted')
-        rv = self.app.get('/api/user/all{}'.format(token))
+        pair = {'person1': 'test1', 'person2': 'test2'}
+        self.app.post('/api/pair/add{}'.format(token), data=json.dumps(pair), content_type='application/json')
+        rv = self.app.delete('/api/user/delete/test1{}'.format(token)).json
+        self.assertEqual(rv.get('message'), 'test1 deleted')
+        rv = self.app.get('/api/user/all{}'.format(token)).json
         user_json = {'active': 1, 'name': 'Per Pål', 'username': 'test1'}
-        self.assertNotIn(user_json, rv.json)
+        self.assertNotIn(user_json, rv)
+        rv = self.app.get('/api/pair/all{}'.format(token)).json[0]
+        self.assertEqual(None, rv['person1'])
+        self.assertEqual('test2', rv['person2'])
+
 
     def test_get_active_users(self):
         data = {'username': 'test2', 'name': 'updated', 'active': False}

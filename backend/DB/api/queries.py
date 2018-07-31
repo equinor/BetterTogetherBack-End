@@ -80,6 +80,8 @@ def get_pair_counts_between_all_users():
     counters = []
     for pair in pairs:
         should_add_pair = True
+        if pair.person1 is None or pair.person2 is None:
+            continue
         for i in range(len(counters)):
             if (pair[0] == counters[i]['target']) and (pair[1] == counters[i]['source']):
                 counters[i]['total'] += pair[2]
