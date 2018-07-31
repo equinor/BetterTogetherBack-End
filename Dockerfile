@@ -3,7 +3,6 @@ MAINTAINER Summer Students at SIB
 
 WORKDIR /
 
-ENV BT_TOKEN TEST
 ENV PYTHONPATH "${PYTHONPATH}:/"
 
 COPY ./backend /backend
