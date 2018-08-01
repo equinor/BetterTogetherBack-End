@@ -4,6 +4,7 @@ from flask import jsonify, request, abort, render_template, Flask
 import os
 
 from backend.DB.api.tables import User, Pair, Reward, Threshold
+from backend.slack import slackbot
 
 app = Flask(__name__)
 
@@ -275,6 +276,19 @@ def update_threshold(reward_type):
     return jsonify({'reward_type': threshold.reward_type, 'threshold': threshold.threshold})
 
 
-if __name__ == '__main__':
+def set_up_db():
+    db.create_all()
     db.init_app(app)
-    app.run(host='127.0.0.1', port=app.config.get("PORT", 5000))
+    persons = slackbot.get_persons_from_slack()
+    for person in persons:
+        queries.add_user(User(person['username'], person['name'], person['image']))
+    threshold1 = Threshold('pizza', 50)
+    threshold2 = Threshold('cake', 42)
+
+    queries.add_threshold(threshold1)
+    queries.add_threshold(threshold2)
+
+
+if __name__ == '__main__':
+    set_up_db()
+    app.run(host='0.0.0.0', port=80)
