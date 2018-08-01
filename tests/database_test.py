@@ -2,11 +2,10 @@ import datetime
 import json
 import math
 import time
+
+from backend.DB.api.routes import app
+from backend.DB.api.tables import db
 import unittest
-
-from backend.DB.api import app, db
-
-from backend.DB.api import routes, tables
 
 token = "?token=TEST"
 
@@ -19,6 +18,8 @@ class DatabaseTester(unittest.TestCase):
         app.config['SECRET_KEY'] = 'TEST'
         app.config['TESTING'] = True
         self.app = app.test_client()
+        app.app_context().push()
+        db.init_app(app)
         db.create_all()
         # Test users
         data = [
@@ -61,11 +62,17 @@ class DatabaseTester(unittest.TestCase):
         self.assertFalse(rv.json[0].get('active'))
 
     def test_delete_user(self):
-        rv = self.app.delete('/api/user/delete/test1{}'.format(token))
-        self.assertEqual(rv.json.get('message'), 'test1 deleted')
-        rv = self.app.get('/api/user/all{}'.format(token))
+        pair = {'person1': 'test1', 'person2': 'test2'}
+        self.app.post('/api/pair/add{}'.format(token), data=json.dumps(pair), content_type='application/json')
+        rv = self.app.delete('/api/user/delete/test1{}'.format(token)).json
+        self.assertEqual(rv.get('message'), 'test1 deleted')
+        rv = self.app.get('/api/user/all{}'.format(token)).json
         user_json = {'active': 1, 'name': 'Per Pål', 'username': 'test1'}
-        self.assertNotIn(user_json, rv.json)
+        self.assertNotIn(user_json, rv)
+        rv = self.app.get('/api/pair/all{}'.format(token)).json[0]
+        self.assertEqual(None, rv['person1'])
+        self.assertEqual('test2', rv['person2'])
+
 
     def test_get_active_users(self):
         data = {'username': 'test2', 'name': 'updated', 'active': False}
@@ -231,6 +238,8 @@ class DatabaseTester(unittest.TestCase):
         self.assertEqual(400, response.status_code)
         response = self.app.post('/api/threshold/add{}'.format(token),
                                  data=json.dumps(faulty_data), content_type='application/json')
+        self.assertEqual(400, response.status_code)
+        response = self.app.delete('/api/user/delete/not_a_username{}'.format(token))
         self.assertEqual(400, response.status_code)
 
     def test_wrong_token(self):

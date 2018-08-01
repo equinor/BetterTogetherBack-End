@@ -1,5 +1,5 @@
 from sqlalchemy import or_, and_
-from backend.DB.api import db
+from backend.DB.api.tables import db
 from backend.DB.api import tables
 from sqlalchemy.exc import IntegrityError
 
@@ -29,6 +29,8 @@ def delete_user(username):
     user = tables.User.query.filter_by(username=username).first()
     db.session.delete(user)
     db.session.commit()
+    deleted_user = tables.User.query.filter_by(username=username).first()
+    return deleted_user is None
 
 
 def update_user(user):
@@ -78,6 +80,8 @@ def get_pair_counts_between_all_users():
     counters = []
     for pair in pairs:
         should_add_pair = True
+        if pair.person1 is None or pair.person2 is None:
+            continue
         for i in range(len(counters)):
             if (pair[0] == counters[i]['target']) and (pair[1] == counters[i]['source']):
                 counters[i]['total'] += pair[2]

@@ -1,13 +1,14 @@
-from backend.DB.api import app, db
-from backend.DB.api.tables import Threshold, User
+from backend.DB.api.routes import app
+from backend.DB.api.tables import Threshold, User, db
 from backend.DB.api import queries
 
 from backend.slack import slackbot
 
 
 def main():
-    db.create_all()
     db.init_app(app)
+    app.app_context().push()
+    db.create_all()
     persons = slackbot.get_persons_from_slack()
     for person in persons:
         queries.add_user(User(person['username'], person['name'], person['image']))

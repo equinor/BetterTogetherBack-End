@@ -1,11 +1,21 @@
-from backend.DB.api import app, queries
-from flask import jsonify, request, abort, render_template
+from backend.DB.api import queries
+from backend.DB.api.tables import db
+from flask import jsonify, request, abort, render_template, Flask
+import os
 
 from backend.DB.api.tables import User, Pair, Reward, Threshold
+
+app = Flask(__name__)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///better_together_db.sqlite3'
+app.config['SECRET_KEY'] = os.environ.get('BT_TOKEN')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 
 @app.before_request
 def verify_token():
+    if app.config['SECRET_KEY'] is None:
+        abort(403)
     token = request.args.get('token')
     if token is None:
         abort(403)
@@ -100,8 +110,11 @@ def update_user():
 @app.route('/api/user/delete/<username>', methods=['DELETE'])
 def delete_user(username):
     user = queries.get_user_by_username(username)
-    queries.delete_user(user.username)
-    return jsonify({'message': user.username + ' deleted'})
+    if user is None:
+        abort(400)
+    if queries.delete_user(user.username):
+        return jsonify({'message': user.username + ' deleted'})
+    abort(400)
 
 
 def format_pairs(pairs):
@@ -263,4 +276,5 @@ def update_threshold(reward_type):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80)
+    db.init_app(app)
+    app.run(host='127.0.0.1', port=app.config.get("PORT", 5000))
