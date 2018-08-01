@@ -2,10 +2,9 @@ import datetime
 import json
 import math
 import time
+from backend.DB.api import app
+from backend.DB.api.tables import db
 import unittest
-
-from backend.DB.api import app, db
-
 from backend.DB.api import routes, tables
 
 token = "?token=TEST"
@@ -19,6 +18,8 @@ class DatabaseTester(unittest.TestCase):
         app.config['SECRET_KEY'] = 'TEST'
         app.config['TESTING'] = True
         self.app = app.test_client()
+        app.app_context().push()
+        db.init_app(app)
         db.create_all()
         # Test users
         data = [

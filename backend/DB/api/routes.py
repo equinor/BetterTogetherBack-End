@@ -1,4 +1,5 @@
 from backend.DB.api import app, queries
+from backend.DB.api.tables import db
 from flask import jsonify, request, abort, render_template
 
 from backend.DB.api.tables import User, Pair, Reward, Threshold
@@ -263,4 +264,5 @@ def update_threshold(reward_type):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80)
+    db.init_app(app)
+    app.run(host='127.0.0.1', port=app.config.get("PORT", 5000))

@@ -5,9 +5,12 @@ import math
 
 from sqlalchemy.orm import relationship
 
-from backend.DB.api import db
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
+
+
+db = SQLAlchemy()
 
 
 @event.listens_for(Engine, "connect")
