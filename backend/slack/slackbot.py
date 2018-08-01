@@ -4,7 +4,6 @@ import urllib
 import base64
 
 from slackclient import SlackClient
-import json
 
 
 def get_persons_from_slack():
@@ -23,7 +22,7 @@ def get_persons_from_slack():
             else:
                 img = urllib.request.urlopen(profile['image_1024'], context=context).read()
                 person['image'] = str(base64.b64encode(img))[2:]
-                filename = person['username']+'.png'
+                filename = person['username']
                 with open(os.path.join('../api/static/images', filename), 'wb') as f:
                     f.write(img)
             person['name'] = profile['real_name']
@@ -32,9 +31,3 @@ def get_persons_from_slack():
         print("request failed")
 
     return persons
-
-
-def write_to_json(data):
-    with open("../backend/json/jsonUserList.json", 'w') as outfile:
-        json.dump(data, outfile, indent=2, sort_keys=True)
-        outfile.close()
