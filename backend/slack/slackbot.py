@@ -23,7 +23,7 @@ def get_persons_from_slack():
                 img = urllib.request.urlopen(profile['image_1024'], context=context).read()
                 person['image'] = str(base64.b64encode(img))[2:]
                 filename = person['username']
-                with open(os.path.join('../api/static/images', filename), 'wb') as f:
+                with open(os.path.join('./backend/DB/api/static/images', filename), 'wb') as f:
                     f.write(img)
             person['name'] = profile['real_name']
             persons.append(person)

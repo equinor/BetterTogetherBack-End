@@ -277,8 +277,9 @@ def update_threshold(reward_type):
 
 
 def set_up_db():
-    db.create_all()
+    app.app_context().push()
     db.init_app(app)
+    db.create_all()
     persons = slackbot.get_persons_from_slack()
     for person in persons:
         queries.add_user(User(person['username'], person['name'], person['image']))
