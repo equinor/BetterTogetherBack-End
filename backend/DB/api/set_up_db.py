@@ -1,4 +1,4 @@
-from backend.DB.api import app
+from backend.DB.api.routes import app
 from backend.DB.api.tables import Threshold, User, db
 from backend.DB.api import queries
 

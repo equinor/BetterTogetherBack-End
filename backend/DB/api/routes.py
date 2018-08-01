@@ -1,12 +1,21 @@
-from backend.DB.api import app, queries
+from backend.DB.api import queries
 from backend.DB.api.tables import db
-from flask import jsonify, request, abort, render_template
+from flask import jsonify, request, abort, render_template, Flask
+import os
 
 from backend.DB.api.tables import User, Pair, Reward, Threshold
+
+app = Flask(__name__)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///better_together_db.sqlite3'
+app.config['SECRET_KEY'] = os.environ.get('BT_TOKEN')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 
 @app.before_request
 def verify_token():
+    if app.config['SECRET_KEY'] is None:
+        abort(403)
     token = request.args.get('token')
     if token is None:
         abort(403)

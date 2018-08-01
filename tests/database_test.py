@@ -2,10 +2,10 @@ import datetime
 import json
 import math
 import time
-from backend.DB.api import app
+
+from backend.DB.api.routes import app
 from backend.DB.api.tables import db
 import unittest
-from backend.DB.api import routes, tables
 
 token = "?token=TEST"
 
