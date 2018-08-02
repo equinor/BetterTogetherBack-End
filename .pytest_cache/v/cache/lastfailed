@@ -1,0 +1,5 @@
+{
+  "tests/database_test.py::DatabaseTester::test_get_earliest_unused_reward": true,
+  "tests/database_test.py::DatabaseTester::test_get_reward_count": true,
+  "tests/database_test.py::DatabaseTester::test_use_reward": true
+}
