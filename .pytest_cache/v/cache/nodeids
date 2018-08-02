@@ -1,0 +1,19 @@
+[
+  "tests/database_test.py::DatabaseTester::test_add_and_get_pair",
+  "tests/database_test.py::DatabaseTester::test_db_filled",
+  "tests/database_test.py::DatabaseTester::test_delete_user",
+  "tests/database_test.py::DatabaseTester::test_disable_and_update_user",
+  "tests/database_test.py::DatabaseTester::test_get_active_users",
+  "tests/database_test.py::DatabaseTester::test_get_earliest_unused_reward",
+  "tests/database_test.py::DatabaseTester::test_get_pair_after_date",
+  "tests/database_test.py::DatabaseTester::test_get_pair_after_reward",
+  "tests/database_test.py::DatabaseTester::test_get_pair_count",
+  "tests/database_test.py::DatabaseTester::test_get_pair_with_user",
+  "tests/database_test.py::DatabaseTester::test_get_reward_count",
+  "tests/database_test.py::DatabaseTester::test_reward_progress",
+  "tests/database_test.py::DatabaseTester::test_update_pair",
+  "tests/database_test.py::DatabaseTester::test_update_threshold",
+  "tests/database_test.py::DatabaseTester::test_use_reward",
+  "tests/database_test.py::DatabaseTester::test_wrong_input",
+  "tests/database_test.py::DatabaseTester::test_wrong_token"
+]

@@ -24,17 +24,15 @@ d3.json("api/user/all?token="+token, (users) => {
             let pizza_percent = (status.pizza_count/status.pizza_thres) * 100;
 
 
-            let set_progress = d3.select('#progress-bar-percentage')
+            let set_progress_cake = d3.select('#progress-bar-percentage-cake')
                 .attr('style', "width:" + cake_percent + "%")
-                .attr('class', () => {
-                    if (cake_percent === 100) {
-                        return 'all-rounded green-blink';
-                    } else {
-                        return 'all-rounded';
-                    }
-                })
                 .append('span')
                 .text(status.cake_count + "/" + status.cake_thres);
+
+            let set_progress_pizza = d3.select('#progress-bar-percentage-pizza')
+                .attr('style', "width:" + pizza_percent + "%")
+                .append('span')
+                .text(status.pizza_count + "/" + status.pizza_thres);
             /*
 
             let setCakeProgress = d3.select('#cake')
@@ -72,7 +70,7 @@ d3.json("api/user/all?token="+token, (users) => {
                     if (d.image === "unknown") {
                         return "../static/images/default.png/?token="+token;
                     } else {
-                        return "../static/images/"+ d.username + "/?token="+token;
+                        return "../static/images/"+ d.username + ".png/?token="+token;
                     }
                 });
 

@@ -29,17 +29,17 @@ h4 {
     display: block;
 }
 
-#progress-bar {
+#progress-bar-cake {
     width: 210px;
-    background: hsl(0, 0%, 70%);
+    background: hsl(40, 3%, 81%);
     position: relative;
     border: 1px solid #111111;
     display: inline-block;
     vertical-align: middle;
 }
 
-#progress-bar-percentage {
-    background: #a5de6f;
+#progress-bar-percentage-cake {
+    background: #ff1243;
     padding: 5px 0;
     margin: 2px;
     color: #000;
@@ -49,7 +49,35 @@ h4 {
     max-width: 98%;
 }
 
-#progress-bar-percentage span {
+#progress-bar-percentage-cake span {
+    display: inline-block;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    vertical-align: middle;
+}
+
+#progress-bar-pizza {
+    width: 210px;
+    background: hsl(40, 3%, 81%);
+    position: relative;
+    border: 1px solid #111111;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#progress-bar-percentage-pizza {
+    background: #ff1243;
+    padding: 5px 0;
+    margin: 2px;
+    color: #000;
+    text-align: center;
+    font-size: small;
+    height: 12px;
+    max-width: 98%;
+}
+
+#progress-bar-percentage-pizza span {
     display: inline-block;
     position: absolute;
     width: 100%;
@@ -93,7 +121,7 @@ h4 {
 
 @font-face {
     font-family: "Noto Emoji Regular";
-    src: url('https://fontlibrary.org/face/noto-emoji') format('truetype');
+    src: url('NotoColorEmoji.ttf?token=TEST') format('truetype');
 }
 
 .achievement-emoji {
