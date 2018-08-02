@@ -9,7 +9,7 @@ from backend.slack import slackbot
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://{}:{}@{}'.format(
-    os.environ.get('USERNAME'), os.environ.get('PASSWORD'), os.environ.get('HOSTNAME'))
+    os.environ.get('POSTGRES_USERNAME'), os.environ.get('POSTGRES_PASSWORD'), os.environ.get('POSTGRES_HOSTNAME'))
 app.config['SECRET_KEY'] = os.environ.get('BT_TOKEN')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
