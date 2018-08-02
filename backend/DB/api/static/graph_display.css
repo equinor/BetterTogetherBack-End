@@ -25,13 +25,15 @@ h4 {
     width: 100%;
 }
 
-#patterns_svg {
-    position:relative;
-}
-
 #content {
+    padding-right: 0px;
     height: 1000px;
 }
+
+#status_bar {
+    padding-left: 0px;
+}
+
 .progress-fraction {
     color: #ff1243;
     text-align: center;

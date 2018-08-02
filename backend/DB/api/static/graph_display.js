@@ -140,8 +140,8 @@ d3.json("api/user/all?token="+token, (users) => {
                     .append("circle")
                     .attr("r", radius)
                     .merge(node)
-                    .attr("cx", (d) => d.x = Math.max(radius, Math.min(width - radius, d.x)))
-                    .attr("cy", (d) => d.y = Math.max(radius, Math.min(height - radius, d.y)))
+                    .attr("cx", (d) => d.x = Math.max(radius, Math.min(width - radius, d.x - radius)))
+                    .attr("cy", (d) => d.y = Math.max(radius, Math.min(height - radius, d.y - radius)))
                     .on("mouseover", handleMouseOver)
                     .on("mouseout", handleMouseOut);
                 node.exit().remove();
