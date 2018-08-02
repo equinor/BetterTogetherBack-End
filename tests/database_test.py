@@ -14,7 +14,7 @@ class DatabaseTester(unittest.TestCase):
 
     def setUp(self):
         # Create a new database for each test
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres@localhost:5432/test_db'
         app.config['SECRET_KEY'] = 'TEST'
         app.config['TESTING'] = True
         self.app = app.test_client()

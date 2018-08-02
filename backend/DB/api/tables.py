@@ -1,29 +1,17 @@
+import math
 import time
 
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey
-import math
-
 from sqlalchemy.orm import relationship
 
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.engine import Engine
-from sqlalchemy import event
-
-
 db = SQLAlchemy()
-
-
-@event.listens_for(Engine, "connect")
-def set_sqlite_pragma(dbapi_connection, connection_record):
-    cursor = dbapi_connection.cursor()
-    cursor.execute("PRAGMA foreign_keys=ON")
-    cursor.close()
 
 
 class User(db.Model):
     username = db.Column('user_name', db.String, primary_key=True)
     name = db.Column('name', db.String)
-    active = db.Column('active', db.Integer)
+    active = db.Column('active', db.Boolean)
     image = db.Column('image', db.String)
     first = relationship('Pair', backref='first', foreign_keys='Pair.person1')
     second = relationship('Pair', backref='second', foreign_keys='Pair.person2')
@@ -36,7 +24,7 @@ class User(db.Model):
 
 
 class Pair(db.Model):
-    date = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.BigInteger, primary_key=True)
     person1 = db.Column(db.String, ForeignKey('user.user_name'), nullable=True)
     person2 = db.Column(db.String, ForeignKey('user.user_name'), nullable=True)
 
@@ -65,9 +53,9 @@ class Threshold(db.Model):
 
 
 class Reward(db.Model):
-    date = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.BigInteger, primary_key=True)
     reward_type = db.Column(db.String)
-    used_reward = db.Column(db.Integer)
+    used_reward = db.Column(db.Boolean)
 
     def __init__(self, reward_type, date=None):
         if not date:

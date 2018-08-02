@@ -8,7 +8,8 @@ from backend.slack import slackbot
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///better_together_db.sqlite3'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://{}:{}@{}'.format(
+    os.environ.get('USERNAME'), os.environ.get('PASSWORD'), os.environ.get('HOSTNAME'))
 app.config['SECRET_KEY'] = os.environ.get('BT_TOKEN')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
