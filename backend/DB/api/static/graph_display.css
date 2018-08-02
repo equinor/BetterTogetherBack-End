@@ -4,7 +4,7 @@ body{
 }
 
 #bs-override {
-    font-family: serif;
+    font-family: FreeSans;
     font-weight: bold;
     color: #ff1243;
     text-align: center;
@@ -14,6 +14,25 @@ body{
 h4 {
     font-family: serif;
     font-weight: bold;
+    color: #ff1243;
+    text-align: center;
+    font-size: 15px;
+}
+
+#graph {
+    display: inline-block;
+    height: 100%;
+    width: 100%;
+}
+
+#patterns_svg {
+    position:relative;
+}
+
+#content {
+    height: 1000px;
+}
+.progress-fraction {
     color: #ff1243;
     text-align: center;
     font-size: 15px;
