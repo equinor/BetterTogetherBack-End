@@ -20,7 +20,7 @@ def get_persons_from_slack():
             if 'image_1024' not in profile.keys():
                 person['image'] = "unknown"
             else:
-                img = urllib.request.urlopen(profile['image_1024'], context=context).read()
+                img = urllib.request.urlopen(profile['image_24'], context=context).read()
                 person['image'] = str(base64.b64encode(img))[2:]
                 filename = person['username']
                 with open(os.path.join('./backend/DB/api/static/images', filename), 'wb') as f:
