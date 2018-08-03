@@ -1,16 +1,19 @@
 let width = document.getElementById("content").clientWidth;
-let height= document.getElementById("content").clientHeight;
+let height = document.getElementById("content").clientHeight;
 
 let radius = width / 30;
 
 let token = (new URL(document.location)).searchParams.get("token");
 
+let set_height = d3.select("#content")
+    .attr("height", window.innerHeight);
 
-d3.json("api/user/all?token="+token, (users) => {
 
-    d3.json("api/pair/count_pair?token="+token, (edge_users) => {
+d3.json("api/user/all?token=" + token, (users) => {
 
-        d3.json("api/reward/progress?token="+token, (status) => {
+    d3.json("api/pair/count_pair?token=" + token, (edge_users) => {
+
+        d3.json("api/reward/progress?token=" + token, (status) => {
 
 
             let user_indices = {};
@@ -21,26 +24,29 @@ d3.json("api/user/all?token="+token, (users) => {
                 "total": v.total,
             }));
 
+            let cake_percent = (status.cake_count / status.cake_thres) * 100;
+            let pizza_percent = (status.pizza_count / status.pizza_thres) * 100;
 
-            let setCakeProgress = d3.select("#cake")
-                .attr("style", "width:" + status.cake_count / status.cake_thres * 100 + "%")
-                .attr("aria-valuemax", status.cake_thres);
-            let cakeFraction = d3.select("#cake-progress")
-                    .text(status.cake_count.toString() + "/" + status.cake_thres.toString());
+            let set_progress_cake = d3.select('#cake-percentage')
+                .attr('style', "width:" + cake_percent + "%")
+                .append('span')
+                .text(status.cake_count + "/" + status.cake_thres);
 
+            let set_progress_pizza = d3.select('#pizza-percentage')
+                .attr('style', "width:" + pizza_percent + "%")
+                .append('span')
+                .text(status.pizza_count + "/" + status.pizza_thres);
 
-
-            let setPizzaProgress = d3.select("#pizza")
-                .attr("style", "width:" + status.pizza_count / status.pizza_thres * 100 + "%")
-                .attr("aria-valuemax", status.pizza_thres)
-                .text(status.pizza_count.toString() + "/" + status.pizza_thres.toString());
-
-            /*
-            let setClaimable = d3. select("#status_bar")
-                .append("div")
-                .text("Claimable cake: "+ status["unused_cake"] +
-                    " Claimable pizza: "+ status["unused_pizza"]);
-            */
+            function rewardBlink() {
+                if (status["unused_cake"] > -1) {
+                    d3.select("#cake")
+                        .attr("class","all-rounded reward-blink")
+                }
+                if (status["unused_pizza"] > 0) {
+                    d3.select("#pizza")
+                        .attr("class","all-rounded reward-blink")
+                }
+            }
 
             //Add patterns to images
             let defs = d3.select("#patterns_svg")
@@ -58,9 +64,9 @@ d3.json("api/user/all?token="+token, (users) => {
                 .attr('preserveAspectRatio', 'none')
                 .attr("href", (d) => {
                     if (d.image === "unknown") {
-                        return "../static/images/default.png/?token="+token;
+                        return "../static/images/default.png/?token=" + token;
                     } else {
-                        return "../static/images/"+ d.username + ".png/?token="+token;
+                        return "../static/images/" + d.username + ".png/?token=" + token;
                     }
                 });
 
@@ -149,9 +155,10 @@ d3.json("api/user/all?token="+token, (users) => {
 
             function ticked() {
                 width = document.getElementById("content").clientWidth;
-                height= document.getElementById("content").clientHeight;
+                height = document.getElementById("content").clientHeight;
                 updateNodes();
                 updateLinks();
+                rewardBlink();
             }
 
             function handleMouseOver(d, i) {
