@@ -52,9 +52,10 @@ def get_pair_history():
     return tables.Pair.query.all()
 
 
-def get_pairs_since_last_reward(reward_type):
+def get_pairs_since_last_used_reward(reward_type):
     reward_date = db.session.query(
-        db.func.max(tables.Reward.date)).filter_by(reward_type=reward_type).first()
+        db.func.max(tables.Reward.date)).filter(and_(
+            reward_type == tables.Reward.reward_type, tables.Reward.used_reward)).first()
     if reward_date[0] is None:
         return get_pair_history()
     else:
