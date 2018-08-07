@@ -73,7 +73,6 @@ class DatabaseTester(unittest.TestCase):
         self.assertEqual(None, rv['person1'])
         self.assertEqual('test2', rv['person2'])
 
-
     def test_get_active_users(self):
         data = {'username': 'test2', 'name': 'updated', 'active': False}
         self.app.put('/api/user/update{}'.format(token), data=json.dumps(data), content_type='application/json')
@@ -122,14 +121,20 @@ class DatabaseTester(unittest.TestCase):
         self.assertNotIn(pair, rv.json.get('pairs'))
 
     def test_get_pair_after_reward(self):
+        pair = {'person1': 'test1', 'person2': 'test3'}
+        self.app.post('/api/pair/add{}'.format(token), data=json.dumps(pair), content_type='application/json')
         date = math.floor(datetime.datetime.now().timestamp() * 1000)
         reward = {'reward_type': 'pizza', 'date': date}
         self.app.post('/api/reward/add{}'.format(token), data=json.dumps(reward), content_type='application/json')
         rv = self.app.get('/api/pair/all/after_last_reward/pizza{}'.format(token))
         pairs = rv.json
-        self.assertEqual(0, len(pairs))
+        self.assertEqual(1, len(pairs))
         pair = {'date': date, 'person1': 'test1', 'person2': 'test3'}
         self.app.post('/api/pair/add{}'.format(token), data=json.dumps(pair), content_type='application/json')
+        rv = self.app.get('api/pair/all/after_last_reward/pizza{}'.format(token))
+        pairs = rv.json
+        self.assertEqual(2, len(pairs))
+        self.app.put('/api/reward/use/pizza{}'.format(token))
         rv = self.app.get('api/pair/all/after_last_reward/pizza{}'.format(token))
         pairs = rv.json
         self.assertEqual(1, len(pairs))

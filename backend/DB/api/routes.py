@@ -42,8 +42,8 @@ def format_users(users):
 
 @app.route('/api/reward/progress')
 def status_data():
-    status = {"cake_count": len(queries.get_pairs_since_last_reward("cake")),
-              "pizza_count": len(queries.get_pairs_since_last_reward("pizza")),
+    status = {"cake_count": len(queries.get_pairs_since_last_used_reward("cake")),
+              "pizza_count": len(queries.get_pairs_since_last_used_reward("pizza")),
               "pizza_thres": queries.get_threshold("pizza").threshold,
               "cake_thres": queries.get_threshold("cake").threshold,
               "unused_cake": queries.get_unused_rewards_count_by_type("cake"),
@@ -175,8 +175,8 @@ def get_pairs_with_user(username):
 
 
 @app.route('/api/pair/all/after_last_reward/<reward_type>', methods=['GET'])
-def get_pairs_since_last_reward(reward_type):
-    pairs = queries.get_pairs_since_last_reward(reward_type)
+def get_pairs_since_last_used_reward(reward_type):
+    pairs = queries.get_pairs_since_last_used_reward(reward_type)
     return jsonify(format_pairs(pairs))
 
 
