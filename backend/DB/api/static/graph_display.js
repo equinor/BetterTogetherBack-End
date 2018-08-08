@@ -116,6 +116,11 @@ d3.json("api/user/all?token=" + token, (users) => {
                 d.fy = null;
             }
 
+            function isLastPairEdge(edge) {
+                return ((edge.source.username === status.last_pair[0] &&
+                    edge.target.username === status.last_pair[1]) ||
+                    (edge.source.username === status.last_pair[1] && edge.target.username === status.last_pair[0]));
+            }
 
             function updateLinks() {
                 let class_link = d3.select("#links")
@@ -127,7 +132,7 @@ d3.json("api/user/all?token=" + token, (users) => {
                     .merge(class_link)
                     .attr("stroke-width", (d) => d.total)
                     .attr("stroke", (d) => {
-                        if (d.source.username === status.last_pair[0] && d.target.username === status.last_pair[1]) {
+                        if (isLastPairEdge(d)) {
                             return "red";
                         } else {
                             return "black";
