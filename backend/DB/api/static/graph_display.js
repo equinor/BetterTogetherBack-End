@@ -1,8 +1,9 @@
-let width = 1500, height = 750;
+let width = document.getElementById("content").clientWidth;
+let height= document.getElementById("content").clientHeight;
 
-let radius = width / 50;
+let radius = width / 30;
 
-let token = (new URL(document.location)).searchParams.get('token');
+let token = (new URL(document.location)).searchParams.get("token");
 
 
 d3.json("api/user/all?token="+token, (users) => {
