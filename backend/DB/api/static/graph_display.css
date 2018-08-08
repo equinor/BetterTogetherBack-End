@@ -1,14 +1,7 @@
 
 body{
     margin: 0;
-}
-
-#bs-override {
-    font-family: serif;
-    font-weight: bold;
-    color: #ff1243;
-    text-align: center;
-    font-size: 25px;
+    height: 100vh;
 }
 
 h4 {
@@ -17,4 +10,86 @@ h4 {
     color: #ff1243;
     text-align: center;
     font-size: 15px;
+}
+
+#graph {
+    display: inline-block;
+    height: 100%;
+    width: 100%;
+}
+
+#status_bar {
+    padding-left: 0px;
+}
+
+.row {
+    height: 100%;
+}
+
+#content {
+    padding-right: 0px;
+    height: 100%;
+}
+
+.all-rounded {
+    border-radius: 0px;
+    width: 100%;
+    height: 20%;
+}
+
+.achievement {
+    width: 100%;
+    margin-top: 30%;
+    margin-bottom: 20%;
+}
+
+#cake, #pizza {
+    width: 70%;
+    background: hsl(40, 5%, 89%);
+    position: relative;
+    border: 1px solid #111111;
+    display: inline-block;
+    vertical-align: middle;
+    margin-bottom: 10%;
+}
+ #cake-percentage, #pizza-percentage {
+    background: #ffb4aa;
+    padding: 5px 0;
+    margin: 2px;
+    text-align: left;
+    font-size: small;
+    height: 12px;
+    max-width: 98%;
+}
+ #cake-percentage span, #pizza-percentage span {
+    display: inline-block;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    margin: -7px;
+    color: black;
+    font-weight: bold;
+ }
+
+ @keyframes reward-blink {
+    0% {
+        background-color: #dec5a8;
+    }
+    50% {
+        background-color: #ffbea0;
+
+        box-shadow: 0 0 10px 5px #ff7677;
+    }
+    100% {
+        background-color: #de9189;
+    }
+}
+
+.reward-blink {
+    animation: reward-blink 1.5s linear infinite;
+}
+
+.em {
+    margin-top: -30px;
+    font-size: xx-large;
 }
