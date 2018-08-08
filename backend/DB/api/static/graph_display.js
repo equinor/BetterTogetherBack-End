@@ -1,16 +1,19 @@
 let width = document.getElementById("content").clientWidth;
-let height= document.getElementById("content").clientHeight;
+let height = document.getElementById("content").clientHeight;
 
 let radius = width / 30;
 
 let token = (new URL(document.location)).searchParams.get("token");
 
+let set_height = d3.select("#content")
+    .attr("height", window.innerHeight);
 
-d3.json("api/user/all?token="+token, (users) => {
 
-    d3.json("api/pair/count_pair?token="+token, (edge_users) => {
+d3.json("api/user/all?token=" + token, (users) => {
 
-        d3.json("api/reward/progress?token="+token, (status) => {
+    d3.json("api/pair/count_pair?token=" + token, (edge_users) => {
+
+        d3.json("api/reward/progress?token=" + token, (status) => {
 
 
             let user_indices = {};
@@ -20,7 +23,6 @@ d3.json("api/user/all?token="+token, (users) => {
                 'target': user_indices[v.target],
                 'total': v.total,
             }));
-
 
             let setCakeProgress = d3.select('#cake')
                 .attr('style', "width:" + status.cake_count / status.cake_thres * 100 + "%")
@@ -38,7 +40,6 @@ d3.json("api/user/all?token="+token, (users) => {
                 .text("Claimable cake: "+ status['unused_cake'] +
                     " Claimable pizza: "+ status['unused_pizza']);
 
-
             //Add patterns to images
             let defs = d3.select('#patterns_svg')
                 .selectAll('pattern')
@@ -55,9 +56,9 @@ d3.json("api/user/all?token="+token, (users) => {
                 .attr('preserveAspectRatio', 'none')
                 .attr('href', (d) => {
                     if (d.image === "unknown") {
-                        return "../static/images/default.png/?token="+token;
+                        return "../static/images/default.png/?token=" + token;
                     } else {
-                        return "../static/images/"+ d.username + "/?token="+token;
+                        return "../static/images/" + d.username + ".png/?token=" + token;
                     }
                 });
 
@@ -144,9 +145,29 @@ d3.json("api/user/all?token="+token, (users) => {
                 node.exit().remove();
             }
 
+            function rewardBlink() {
+                if (status["cake_count"] >= status["cake_thres"]) {
+                    d3.select("#cake")
+                        .attr("class","all-rounded reward-blink");
+                } else {
+                    d3.select("#cake")
+                        .attr("class", "all-rounded");
+                }
+                if (status["pizza_count"] >= status["pizza_thres"]) {
+                    d3.select("#pizza")
+                        .attr("class","all-rounded reward-blink");
+                } else {
+                   d3.select("#pizza")
+                        .attr("class", "all-rounded");
+                }
+            }
+
             function ticked() {
+                width = document.getElementById("content").clientWidth;
+                height = document.getElementById("content").clientHeight;
                 updateNodes();
                 updateLinks();
+                rewardBlink();
             }
 
             function handleMouseOver(d, i) {
