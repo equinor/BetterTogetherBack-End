@@ -1,6 +1,6 @@
 let simulation;
-let links;
-let node;
+let links = {};
+let node = {};
 
 let width = document.getElementById("content").clientWidth;
 let height = document.getElementById("content").clientHeight;
@@ -123,25 +123,42 @@ d3.json("api/user/all?token=" + token, (users) => {
                 rewardBlink();
             }
 
-            let userIndices = {};
-            users.forEach((v, i) => userIndices[v.username] = i);
-            links = edgeUsers.map((v) => ({
-                "source": userIndices[v.source],
-                "target": userIndices[v.target],
-                "total": v.total,
-            }));
-            let cakePercent = (status.cake_count / status.cake_thres) * 100;
-            let pizzaPercent = (status.pizza_count / status.pizza_thres) * 100;
+            function updateData(){
+                d3.json("api/user/active?token=" + token, (users) => {
+                    d3.json("api/pair/count_pair?token=" + token, (edgeUsers) => {
+                        d3.json("api/reward/progress?token=" + token, (newStatus) => {
+                            status = newStatus;
+                            let cakePercent = (status.cake_count / status.cake_thres) * 100;
+                            let pizzaPercent = (status.pizza_count / status.pizza_thres) * 100;
+                            d3.selectAll("span").remove();
+                            d3.select("#cake-percentage")
+                                .attr("style", "width:" + cakePercent + "%")
+                                .append("span")
+                                .text(status.cake_count + "/" + status.cake_thres);
 
-            let setProgressCake = d3.select("#cake-percentage")
-                .attr("style", "width:" + cakePercent + "%")
-                .append("span")
-                .text(status.cake_count + "/" + status.cake_thres);
+                            d3.select("#pizza-percentage")
+                                .attr("style", "width:" + pizzaPercent + "%")
+                                .append("span")
+                                .text(status.pizza_count + "/" + status.pizza_thres);
 
-            let setProgressPizza = d3.select("#pizza-percentage")
-                .attr("style", "width:" + pizzaPercent + "%")
-                .append("span")
-                .text(status.pizza_count + "/" + status.pizza_thres);
+                            let userIndices = {};
+                            users.forEach((v, i) => userIndices[v.username] = i);
+                            let newLinks = edgeUsers.map((v) => ({
+                                "source": userIndices[v.source],
+                                "target": userIndices[v.target],
+                                "total": v.total,
+                            }));
+                            simulation.force("link", d3.forceLink().links(newLinks).strength(1));
+                            if(newLinks.length !== links.length){
+                                simulation.alpha(1).restart();
+                            } else {
+                                simulation.restart();
+                            }
+                            links = newLinks;
+                        });
+                    });
+                });
+            }
 
             //Add patterns to images
             let defs = d3.select("#patterns_svg")
@@ -173,6 +190,9 @@ d3.json("api/user/all?token=" + token, (users) => {
                 .attr("class", "user_node")
                 .attr("r", radius)
                 .attr("fill", (d) => ("url(#" + d.username + ")"));
+
+            updateData();
+            setInterval(updateData, 5000);
 
             simulation = d3.forceSimulation(users)
                 .force("collision", d3.forceCollide().radius(radius + 10))
