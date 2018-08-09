@@ -61,6 +61,16 @@ def get_pairs_since_last_reward(reward_type):
         return tables.Pair.query.filter(tables.Pair.date >= reward_date[0]).all()
 
 
+def get_pairs_since_last_used_reward(reward_type):
+    reward_date = db.session.query(
+        db.func.max(tables.Reward.date)).filter(and_(
+            reward_type == tables.Reward.reward_type, tables.Reward.used_reward)).first()
+    if reward_date[0] is None:
+        return get_pair_history()
+    else:
+        return tables.Pair.query.filter(tables.Pair.date >= reward_date[0]).all()
+
+
 def get_pairs_containing_user(username):
     return db.session.query(tables.Pair).filter(
         or_(tables.Pair.person1 == username, tables.Pair.person2 == username)).all()
