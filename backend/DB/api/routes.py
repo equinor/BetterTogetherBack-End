@@ -2,11 +2,12 @@ from backend.DB.api import queries
 from backend.DB.api.tables import db
 from flask import jsonify, request, abort, render_template, Flask
 import os
-
+from flask_sslify import SSLify
 from backend.DB.api.tables import User, Pair, Reward, Threshold
 from backend.slack import slackbot
 
 app = Flask(__name__)
+sslify = SSLify(app, permanent=True)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://{}:{}@{}'.format(
     os.environ.get('POSTGRES_USERNAME'), os.environ.get('POSTGRES_PASSWORD'), os.environ.get('POSTGRES_HOSTNAME'))
@@ -16,6 +17,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 @app.before_request
 def verify_token():
+    # if not request.is_secure and not app.config['TESTING']:
+    #    return redirect(request.url.replace('http://', 'https://', 1))
     if app.config['SECRET_KEY'] is None:
         abort(403)
     token = request.args.get('token')
@@ -56,7 +59,7 @@ def status_data():
     return jsonify(status)
 
 
-@app.route('/api/user/add', methods=['POST'])
+@app.route('/api/user/add', methods=['POST', 'GET'])
 def add_user():
     user_json = request.get_json()
 
@@ -90,7 +93,7 @@ def get_user(username):
     return format_users([user])
 
 
-@app.route('/api/user/update', methods=['PUT'])
+@app.route('/api/user/update', methods=['PUT', 'GET'])
 def update_user():
     user_json = request.get_json()
 
@@ -109,7 +112,7 @@ def update_user():
     return format_users([user])
 
 
-@app.route('/api/user/delete/<username>', methods=['DELETE'])
+@app.route('/api/user/delete/<username>', methods=['DELETE', 'GET'])
 def delete_user(username):
     user = queries.get_user_by_username(username)
     if user is None:
@@ -127,7 +130,7 @@ def format_pairs(pairs):
     return output
 
 
-@app.route('/api/pair/add', methods=['POST'])
+@app.route('/api/pair/add', methods=['POST', 'GET'])
 def add_pair():
     pair_json = request.get_json()
 
@@ -213,7 +216,7 @@ def format_rewards(rewards):
     return jsonify(output)
 
 
-@app.route('/api/reward/add', methods=['POST'])
+@app.route('/api/reward/add', methods=['POST', 'GET'])
 def add_reward():
     reward_json = request.get_json()
 
@@ -247,12 +250,12 @@ def get_earliest_unused_reward(reward_type):
     return format_rewards([queries.get_earliest_unused_reward(reward_type)])
 
 
-@app.route('/api/reward/use/<reward_type>', methods=['PUT'])
+@app.route('/api/reward/use/<reward_type>', methods=['PUT', 'GET'])
 def use_reward(reward_type):
     return format_rewards([queries.use_reward(reward_type)])
 
 
-@app.route('/api/threshold/add', methods=['POST'])
+@app.route('/api/threshold/add', methods=['POST', 'GET'])
 def add_threshold():
     thres_json = request.get_json()
 
@@ -274,7 +277,7 @@ def get_threshold(reward_type):
     return jsonify([{'reward_type': threshold.reward_type, 'threshold': threshold.threshold}])
 
 
-@app.route('/api/threshold/update/<reward_type>', methods=['PUT'])
+@app.route('/api/threshold/update/<reward_type>', methods=['PUT', 'GET'])
 def update_threshold(reward_type):
     thres_json = request.get_json()
 
