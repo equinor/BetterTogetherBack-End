@@ -2,9 +2,30 @@ from backend.DB.api import queries
 from backend.DB.api.tables import db
 from flask import jsonify, request, abort, render_template, Flask
 import os
+from flask_apscheduler import APScheduler
 
 from backend.DB.api.tables import User, Pair, Reward, Threshold
 from backend.slack import slackbot
+
+
+def update_users():
+    with app.app_context():
+        users = queries.get_active_users()
+        slack_users = slackbot.get_persons_from_slack()
+        # update and add users from slack
+        for slack_user in slack_users:
+            user = User(slack_user['username'], slack_user['name'], slack_user['image'])
+            if user not in users:
+                queries.add_user(user)
+            else:
+                user.active = True
+                queries.update_user(user)
+        # set users to inactive if they are not present in slack users
+        for user in users:
+            if not any(user.username == u['username'] for u in slack_users):
+                user.active = False
+                queries.update_user(user)
+
 
 app = Flask(__name__)
 
@@ -12,6 +33,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://{}:{}@{}'.format(
     os.environ.get('POSTGRES_USERNAME'), os.environ.get('POSTGRES_PASSWORD'), os.environ.get('POSTGRES_HOSTNAME'))
 app.config['SECRET_KEY'] = os.environ.get('BT_TOKEN')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['JOBS'] = [{
+    'id': 'user-update',
+    'func': update_users,
+    'trigger': 'interval',
+    'seconds': 10,
+}]
 
 
 @app.before_request
@@ -288,19 +315,20 @@ def update_threshold(reward_type):
 
 
 def set_up_db():
-    app.app_context().push()
-    db.init_app(app)
     db.create_all()
-    persons = slackbot.get_persons_from_slack()
-    for person in persons:
-        queries.add_user(User(person['username'], person['name'], person['image']))
-    threshold1 = Threshold('pizza', 50)
-    threshold2 = Threshold('cake', 42)
+    update_users()
+    threshold1 = Threshold('pizza', 13)
+    threshold2 = Threshold('cake', 7)
 
     queries.add_threshold(threshold1)
     queries.add_threshold(threshold2)
 
 
 if __name__ == '__main__':
+    app.app_context().push()
+    db.init_app(app)
+    scheduler = APScheduler()
+    scheduler.init_app(app)
+    scheduler.start()
     set_up_db()
     app.run(host='0.0.0.0', port=80)
