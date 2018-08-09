@@ -156,6 +156,10 @@ def get_threshold(reward_type):
     return tables.Threshold.query.filter_by(reward_type=reward_type).first()
 
 
+def get_all_thresholds():
+    return tables.Threshold.query.all()
+
+
 def update_threshold(threshold):
     tables.Threshold.query.filter_by(reward_type=threshold.reward_type).update(
         {'threshold': threshold.threshold})

@@ -32,8 +32,8 @@ class DatabaseTester(unittest.TestCase):
         for user in data:
             self.app.post('/api/user/add{}'.format(token), data=json.dumps(user), content_type='application/json')
         thresholds = [
-            {'threshold': 52, 'reward_type': 'pizza'},
-            {'threshold': 40, 'reward_type': 'cake'}
+            {'threshold': 2, 'reward_type': 'pizza'},
+            {'threshold': 1, 'reward_type': 'cake'}
         ]
         for threshold in thresholds:
             self.app.post('/api/threshold/add{}'.format(token), data=json.dumps(threshold),
@@ -49,9 +49,9 @@ class DatabaseTester(unittest.TestCase):
         rv = self.app.get('/api/user/all{}'.format(token))
         self.assertEqual(5, len(rv.json))
         thres = self.app.get('api/threshold/get/cake{}'.format(token))
-        self.assertEqual(40, thres.json[0]['threshold'])
+        self.assertEqual(1, thres.json[0]['threshold'])
         thres = self.app.get('api/threshold/get/pizza{}'.format(token))
-        self.assertEqual(52, thres.json[0]['threshold'])
+        self.assertEqual(2, thres.json[0]['threshold'])
 
     def test_disable_and_update_user(self):
 
@@ -98,6 +98,16 @@ class DatabaseTester(unittest.TestCase):
         for pair in pairs:
             output.append(pair.get('date'))
         self.assertIn(date, output)
+
+    def test_add_reward_if_enough_pairs(self):
+        pair1 = {'person1': 'test1', 'person2': 'test3'}
+        self.app.post('/api/pair/add{}'.format(token), data=json.dumps(pair1), content_type='application/json')
+        rewards = self.app.get('/api/reward/all{}'.format(token)).json
+        self.assertEqual(1, len(rewards))
+
+        self.app.post('/api/pair/add{}'.format(token), data=json.dumps(pair1), content_type='application/json')
+        rewards = self.app.get('/api/reward/all{}'.format(token)).json
+        self.assertEqual(3, len(rewards))
 
     def test_get_pair_with_user(self):
         date = math.floor(datetime.datetime.now().timestamp() * 1000)
