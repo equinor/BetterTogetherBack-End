@@ -1,6 +1,6 @@
 from backend.DB.api import queries
 from backend.DB.api.tables import db
-from flask import jsonify, request, abort, render_template, Flask
+from flask import jsonify, request, abort, render_template, Flask, redirect
 import os
 
 from backend.DB.api.tables import User, Pair, Reward, Threshold
@@ -16,6 +16,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 @app.before_request
 def verify_token():
+    if not request.is_secure:
+        return redirect(request.url.replace('http://', 'https://'))
     if app.config['SECRET_KEY'] is None:
         abort(403)
     token = request.args.get('token')
