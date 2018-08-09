@@ -30,14 +30,16 @@ class DatabaseTester(unittest.TestCase):
             {'active': 1, 'name': 'Per Pål', 'username': 'test5'},
         ]
         for user in data:
-            self.app.post('/api/user/add{}'.format(token), data=json.dumps(user), content_type='application/json')
+            rv = self.app.post('/api/user/add{}'.format(token), data=json.dumps(user),
+                          content_type='application/json', follow_redirects=True)
+            print(rv)
         thresholds = [
             {'threshold': 2, 'reward_type': 'pizza'},
             {'threshold': 1, 'reward_type': 'cake'}
         ]
         for threshold in thresholds:
             self.app.post('/api/threshold/add{}'.format(token), data=json.dumps(threshold),
-                          content_type='application/json')
+                          content_type='application/json', follow_redirects=True)
 
     def tearDown(self):
         # Empty db after each test
@@ -46,11 +48,11 @@ class DatabaseTester(unittest.TestCase):
 
     def test_db_filled(self):
         # Verify that all users have been added to the db
-        rv = self.app.get('/api/user/all{}'.format(token))
+        rv = self.app.get('/api/user/all{}'.format(token), follow_redirects=True)
         self.assertEqual(5, len(rv.json))
-        thres = self.app.get('api/threshold/get/cake{}'.format(token))
+        thres = self.app.get('api/threshold/get/cake{}'.format(token),follow_redirects=True)
         self.assertEqual(1, thres.json[0]['threshold'])
-        thres = self.app.get('api/threshold/get/pizza{}'.format(token))
+        thres = self.app.get('api/threshold/get/pizza{}'.format(token), follow_redirects=True)
         self.assertEqual(2, thres.json[0]['threshold'])
 
     def test_disable_and_update_user(self):
