@@ -37,7 +37,7 @@ app.config['JOBS'] = [{
     'id': 'user-update',
     'func': update_users,
     'trigger': 'interval',
-    'seconds': 10,
+    'seconds': 7200,
 }]
 
 
