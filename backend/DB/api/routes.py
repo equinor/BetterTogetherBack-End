@@ -38,7 +38,7 @@ app.config['JOBS'] = [{
     'id': 'user-update',
     'func': update_users,
     'trigger': 'interval',
-    'seconds': 10,
+    'seconds': 7200,
 }]
 app.config['SCHEDULER_JOBSTORES'] = {'default': SQLAlchemyJobStore(url=app.config['SQLALCHEMY_DATABASE_URI'])}
 app.config['SCHEDULER_API_ENABLED'] = True
