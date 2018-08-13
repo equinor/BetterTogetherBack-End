@@ -17,10 +17,10 @@ def get_persons_from_slack():
             person = dict()
             profile = client.api_call("users.profile.get", user=member)['profile']
             person['username'] = profile['display_name_normalized']
-            if 'image_1024' not in profile.keys():
+            if 'image_192' not in profile.keys():
                 person['image'] = "unknown"
             else:
-                img = urllib.request.urlopen(profile['image_24'], context=context).read()
+                img = urllib.request.urlopen(profile['image_192'], context=context).read()
                 person['image'] = str(base64.b64encode(img))[2:]
                 filename = person['username']
                 with open(os.path.join('./backend/DB/api/static/images', filename), 'wb') as f:
