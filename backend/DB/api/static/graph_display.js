@@ -12,7 +12,7 @@ let token = (new URL(document.location)).searchParams.get("token");
 let setHeight = d3.select("#content")
     .attr("height", window.innerHeight);
 
-d3.json("api/user/all?token=" + token, (users) => {
+d3.json("api/user/active?token=" + token, (users) => {
     let status = {};
     let edgeUsers = {};
     function updateData(){

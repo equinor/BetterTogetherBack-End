@@ -15,10 +15,10 @@ def update_users():
     slack_users = slackbot.get_persons_from_slack()
     # update and add users from slack
     for slack_user in slack_users:
-        user = User(slack_user['username'], slack_user['name'], slack_user['image'])
-        if user not in users:
-            queries.add_user(user)
+        if not any(user.username == slack_user['username'] for user in users):
+            queries.add_user(User(slack_user['username'], slack_user['name'], slack_user['image']))
         else:
+            user = User(slack_user['username'], slack_user['name'], slack_user['image'])
             user.active = True
             queries.update_user(user)
     # set users to inactive if they are not present in slack users
@@ -36,9 +36,10 @@ app.config['SECRET_KEY'] = os.environ.get('BT_TOKEN')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JOBS'] = [{
     'id': 'user-update',
+    'replace_existing': True,
     'func': update_users,
     'trigger': 'interval',
-    'seconds': 7200,
+    'hours': 2,
 }]
 app.config['SCHEDULER_JOBSTORES'] = {'default': SQLAlchemyJobStore(url=app.config['SQLALCHEMY_DATABASE_URI'])}
 app.config['SCHEDULER_API_ENABLED'] = True
@@ -330,8 +331,8 @@ def set_up_db():
 if __name__ == '__main__':
     app.app_context().push()
     db.init_app(app)
-    # scheduler = APScheduler()
-    # scheduler.init_app(app)
-    # scheduler.start()
+    scheduler = APScheduler()
+    scheduler.init_app(app)
+    scheduler.start()
     set_up_db()
     app.run(host='0.0.0.0', port=80)
