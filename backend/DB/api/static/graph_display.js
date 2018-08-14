@@ -175,7 +175,7 @@ d3.json("api/user/active?token=" + token, (users) => {
             if (d.image === "unknown") {
                 return "../static/images/default.png/?token=" + token;
             } else {
-                return "../static/images/" + d.username + "/?token=" + token;
+                return "../static/images/" + d.username + "?token=" + token;
             }
         });
 
