@@ -16,11 +16,11 @@ class User(db.Model):
     first = relationship('Pair', backref='first', foreign_keys='Pair.person1')
     second = relationship('Pair', backref='second', foreign_keys='Pair.person2')
 
-    def __init__(self, username, name, image='unknown'):
+    def __init__(self, username, name, image='unknown', active=True):
         self.username = username
         self.name = name
         self.image = image
-        self.active = True
+        self.active = active
 
 
 class Pair(db.Model):
