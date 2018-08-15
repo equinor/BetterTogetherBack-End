@@ -106,11 +106,6 @@ def get_rewards():
     return rewards
 
 
-def get_unused_rewards_count_by_type(reward_type):
-    return tables.Reward.query.filter(and_(
-        tables.Reward.reward_type == reward_type, tables.Reward.used_reward == False)).count()
-
-
 def use_reward(reward_type):
     reward_date = db.session.query(db.func.min(tables.Reward.date)).filter(and_(
         tables.Reward.reward_type == reward_type, tables.Reward.used_reward == False)).first()[0]

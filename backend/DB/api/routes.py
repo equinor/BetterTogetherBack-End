@@ -78,8 +78,6 @@ def status_data():
               "pizza_count": len(queries.get_pairs_since_last_used_reward("pizza")),
               "pizza_thres": queries.get_threshold("pizza").threshold,
               "cake_thres": queries.get_threshold("cake").threshold,
-              "unused_cake": queries.get_unused_rewards_count_by_type("cake"),
-              "unused_pizza": queries.get_unused_rewards_count_by_type("pizza"),
               }
     pairs = queries.get_pair_history()
     if len(pairs) > 0:
