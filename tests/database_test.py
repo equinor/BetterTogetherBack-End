@@ -2,9 +2,9 @@ import datetime
 import json
 import math
 import time
-
+from backend.DB.api import queries
 from backend.DB.api.routes import app
-from backend.DB.api.tables import db
+from backend.DB.api.tables import db, User, Reward
 import unittest
 
 token = "?token=TEST"
@@ -23,14 +23,14 @@ class DatabaseTester(unittest.TestCase):
         db.create_all()
         # Test users
         data = [
-            {'active': 1, 'name': 'Per Pål', 'username': 'test1'},
-            {'active': 1, 'name': 'Per Pål', 'username': 'test2'},
-            {'active': 1, 'name': 'Per Pål', 'username': 'test3'},
-            {'active': 1, 'name': 'Per Pål', 'username': 'test4'},
-            {'active': 1, 'name': 'Per Pål', 'username': 'test5'},
+            {'active': True, 'name': 'Per Pål', 'username': 'test1'},
+            {'active': True, 'name': 'Per Pål', 'username': 'test2'},
+            {'active': True, 'name': 'Per Pål', 'username': 'test3'},
+            {'active': True, 'name': 'Per Pål', 'username': 'test4'},
+            {'active': True, 'name': 'Per Pål', 'username': 'test5'},
         ]
         for user in data:
-            self.app.post('/api/user/add{}'.format(token), data=json.dumps(user), content_type='application/json')
+            queries.add_user(User(user['username'], user['name']))
         thresholds = [
             {'threshold': 2, 'reward_type': 'pizza'},
             {'threshold': 1, 'reward_type': 'cake'}
@@ -48,18 +48,10 @@ class DatabaseTester(unittest.TestCase):
         # Verify that all users have been added to the db
         rv = self.app.get('/api/user/all{}'.format(token))
         self.assertEqual(5, len(rv.json))
-        thres = self.app.get('api/threshold/get/cake{}'.format(token))
-        self.assertEqual(1, thres.json[0]['threshold'])
-        thres = self.app.get('api/threshold/get/pizza{}'.format(token))
-        self.assertEqual(2, thres.json[0]['threshold'])
-
-    def test_disable_and_update_user(self):
-
-        user = {'username': 'test2', 'name': 'updated', 'active': 0}
-        rv = self.app.put(
-            '/api/user/update{}'.format(token), data=json.dumps(user),
-            content_type='application/json')
-        self.assertFalse(rv.json[0].get('active'))
+        thres = queries.get_threshold('cake')
+        self.assertEqual(1, thres.threshold)
+        thres = queries.get_threshold('pizza')
+        self.assertEqual(2, thres.threshold)
 
     def test_delete_user(self):
         pair = {'person1': 'test1', 'person2': 'test2'}
@@ -74,8 +66,7 @@ class DatabaseTester(unittest.TestCase):
         self.assertEqual('test2', rv['person2'])
 
     def test_get_active_users(self):
-        data = {'username': 'test2', 'name': 'updated', 'active': False}
-        self.app.put('/api/user/update{}'.format(token), data=json.dumps(data), content_type='application/json')
+        queries.update_user(User('test2', 'updated', active=False))
         rv = self.app.get('/api/user/active{}'.format(token))
         users = rv.json
         usernames = []
@@ -108,32 +99,24 @@ class DatabaseTester(unittest.TestCase):
         rewards = self.app.get('/api/reward/all{}'.format(token)).json
         self.assertEqual(3, len(rewards))
 
-    def test_get_pair_with_user(self):
-        date = math.floor(datetime.datetime.now().timestamp() * 1000)
-        pair = {'date': date, 'person1': 'test1', 'person2': 'test3'}
-
-        self.app.post('/api/pair/add{}'.format(token), data=json.dumps(pair), content_type='application/json')
-
-        rv = self.app.get('/api/pair/with_user/test1{}'.format(token))
-        self.assertIn(pair, rv.json.get('pairs'))
-
-        rv = self.app.get('/api/pair/with_user/test2{}'.format(token))
-        self.assertNotIn(pair, rv.json.get('pairs'))
-
     def test_get_pair_after_reward(self):
         pair = {'person1': 'test1', 'person2': 'test3'}
         self.app.post('/api/pair/add{}'.format(token), data=json.dumps(pair), content_type='application/json')
         date = math.floor(datetime.datetime.now().timestamp() * 1000)
-        reward = {'reward_type': 'pizza', 'date': date}
-        self.app.post('/api/reward/add{}'.format(token), data=json.dumps(reward), content_type='application/json')
+
+        queries.add_reward(Reward('pizza'))
+
         rv = self.app.get('/api/pair/all/after_last_reward/pizza{}'.format(token))
         pairs = rv.json
         self.assertEqual(1, len(pairs))
+
         pair = {'date': date, 'person1': 'test1', 'person2': 'test3'}
         self.app.post('/api/pair/add{}'.format(token), data=json.dumps(pair), content_type='application/json')
+
         rv = self.app.get('api/pair/all/after_last_reward/pizza{}'.format(token))
         pairs = rv.json
         self.assertEqual(2, len(pairs))
+
         self.app.put('/api/reward/use/pizza{}'.format(token))
         rv = self.app.get('api/pair/all/after_last_reward/pizza{}'.format(token))
         pairs = rv.json
@@ -154,20 +137,6 @@ class DatabaseTester(unittest.TestCase):
         self.assertEqual(1, len(pairs))
         self.assertIn(pair2.get('person1'), pairs[0].get('person1'))
 
-    def test_update_pair(self):
-        date = math.floor(datetime.datetime.now().timestamp() * 1000)
-        pair1 = {'person1': 'test1', 'person2': 'test2', 'date': date}
-
-        self.app.post('/api/pair/add{}'.format(token), data=json.dumps(pair1), content_type='application/json')
-
-        pair1 = {'person1': 'test3', 'person2': 'test2'}
-
-        self.app.put(('/api/pair/at_date/update/{}{}'.format(date, token)),
-                     data=json.dumps(pair1), content_type='application/json')
-
-        rv = self.app.get('/api/pair/at_date/get/{}{}'.format(date, token))
-        self.assertEqual('test3', rv.json.get('person1'))
-
     def test_get_pair_count(self):
         pair1 = {'person1': 'test1', 'person2': 'test2'}
         pair2 = {'person1': 'test2', 'person2': 'test1'}
@@ -181,49 +150,25 @@ class DatabaseTester(unittest.TestCase):
         self.assertEqual(1, response[1]['total'])
 
     def test_get_reward_count(self):
-        reward1 = {'reward_type': 'pizza'}
-        reward2 = {'reward_type': 'cake'}
-        reward3 = {'reward_type': 'pizza'}
-
-        self.app.post('/api/reward/add{}'.format(token), data=json.dumps(reward1), content_type='application/json')
-        self.app.post('/api/reward/add{}'.format(token), data=json.dumps(reward2), content_type='application/json')
-        self.app.post('/api/reward/add{}'.format(token), data=json.dumps(reward3), content_type='application/json')
+        queries.add_reward(Reward('pizza'))
+        queries.add_reward(Reward('cake'))
+        queries.add_reward(Reward('pizza'))
 
         rewards = self.app.get('/api/reward/all{}'.format(token)).json
         self.assertEqual(3, len(rewards))
-        count = self.app.get('api/reward/unused/pizza{}'.format(token)).json
-        self.assertEqual(2, count)
-        count = self.app.get('api/reward/unused/cake{}'.format(token)).json
-        self.assertEqual(1, count)
 
     def test_use_reward(self):
-        reward1 = {'reward_type': 'pizza'}
-        reward2 = {'reward_type': 'cake'}
-        reward3 = {'reward_type': 'pizza'}
-
-        self.app.post('/api/reward/add{}'.format(token), data=json.dumps(reward1), content_type='application/json')
-        self.app.post('/api/reward/add{}'.format(token), data=json.dumps(reward2), content_type='application/json')
-        self.app.post('/api/reward/add{}'.format(token), data=json.dumps(reward3), content_type='application/json')
+        queries.add_reward(Reward('cake'))
+        queries.add_reward(Reward('pizza'))
+        queries.add_reward(Reward('pizza'))
 
         self.app.put('/api/reward/use/pizza{}'.format(token))
-        count = self.app.get('/api/reward/unused/pizza{}'.format(token)).json
-
+        rewards = self.app.get('api/reward/all{}'.format(token)).json
+        count = 0
+        for r in rewards:
+            if r['used_reward']:
+                count += 1
         self.assertEqual(1, count)
-
-    def test_get_earliest_unused_reward(self):
-        date = math.floor(time.time() * 1000)
-
-        reward1 = {'reward_type': 'pizza', 'date': date}
-        reward2 = {'reward_type': 'cake'}
-        reward3 = {'reward_type': 'pizza'}
-
-        self.app.post('/api/reward/add{}'.format(token), data=json.dumps(reward1), content_type='application/json')
-        self.app.post('/api/reward/add{}'.format(token), data=json.dumps(reward2), content_type='application/json')
-        self.app.post('/api/reward/add{}'.format(token), data=json.dumps(reward3), content_type='application/json')
-
-        reward = self.app.get('/api/reward/unused/earliest/pizza{}'.format(token)).json[0]
-
-        self.assertEqual(reward['date'], date)
 
     def test_reward_progress(self):
         result = self.app.get('/api/reward/progress{}'.format(token), content_type='application/json').json
@@ -234,22 +179,16 @@ class DatabaseTester(unittest.TestCase):
         self.assertIn('last_pair', result.keys())
 
     def test_update_threshold(self):
-        updated_info = {'threshold': 42}
-        self.app.put('/api/threshold/update/pizza{}'.format(token),
-                     data=json.dumps(updated_info), content_type='application/json')
-        threshold = self.app.get('/api/threshold/get/pizza{}'.format(token)).json[0].get('threshold')
-        self.assertEqual(42, threshold)
+        self.app.put('/api/threshold/update/pizza/42{}'.format(token))
+        threshold = queries.get_threshold('pizza')
+        self.assertEqual(42, threshold.threshold)
 
     def test_wrong_input(self):
         faulty_data = {'wrong': 'this is wrong'}
-        response = self.app.post('/api/user/add{}'.format(token),
-                                 data=json.dumps(faulty_data), content_type='application/json')
-        self.assertEqual(400, response.status_code)
         response = self.app.post('/api/pair/add{}'.format(token),
                                  data=json.dumps(faulty_data), content_type='application/json')
         self.assertEqual(400, response.status_code)
-        response = self.app.post('/api/reward/add{}'.format(token),
-                                 data=json.dumps(faulty_data), content_type='application/json')
+
         self.assertEqual(400, response.status_code)
         response = self.app.post('/api/threshold/add{}'.format(token),
                                  data=json.dumps(faulty_data), content_type='application/json')
