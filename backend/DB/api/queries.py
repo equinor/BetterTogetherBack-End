@@ -71,17 +71,8 @@ def get_pairs_since_last_used_reward(reward_type):
         return tables.Pair.query.filter(tables.Pair.date >= reward_date[0]).all()
 
 
-def get_pairs_containing_user(username):
-    return db.session.query(tables.Pair).filter(
-        or_(tables.Pair.person1 == username, tables.Pair.person2 == username)).all()
-
-
 def get_pairs_from_date(date):
     return tables.Pair.query.filter(tables.Pair.date >= date).all()
-
-
-def get_pair(date):
-    return tables.Pair.query.filter_by(date=date).first()
 
 
 def get_pair_counts_between_all_users():
@@ -101,12 +92,6 @@ def get_pair_counts_between_all_users():
     return counters
 
 
-def update_pair(pair):
-    tables.Pair.query.filter_by(date=pair.date).update(
-        {'person1': pair.person1, 'person2': pair.person2})
-    db.session.commit()
-
-
 # Queries for reward
 def add_reward(reward):
     try:
@@ -124,22 +109,6 @@ def get_rewards():
 def get_unused_rewards_count_by_type(reward_type):
     return tables.Reward.query.filter(and_(
         tables.Reward.reward_type == reward_type, tables.Reward.used_reward == False)).count()
-
-
-def get_last_reward_type():
-    reward = tables.Reward.query(db.func.max(tables.Reward.date)).first()
-    return reward.reward_type
-
-
-def get_last_reward_date():
-    reward = tables.Reward.query(db.func.max(tables.Reward.date)).first()
-    return reward.date
-
-
-def get_earliest_unused_reward(reward_type):
-    reward = tables.Reward.query.filter(
-        and_(tables.Reward.reward_type == reward_type, tables.Reward.used_reward == False)).first()
-    return reward
 
 
 def use_reward(reward_type):
