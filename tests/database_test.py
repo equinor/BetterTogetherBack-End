@@ -179,9 +179,7 @@ class DatabaseTester(unittest.TestCase):
         self.assertIn('last_pair', result.keys())
 
     def test_update_threshold(self):
-        updated_info = {'threshold': 42}
-        self.app.put('/api/threshold/update/pizza{}'.format(token),
-                     data=json.dumps(updated_info), content_type='application/json')
+        self.app.put('/api/threshold/update/pizza/42{}'.format(token))
         threshold = queries.get_threshold('pizza')
         self.assertEqual(42, threshold.threshold)
 

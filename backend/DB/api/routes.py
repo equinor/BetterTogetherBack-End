@@ -202,17 +202,12 @@ def add_threshold():
     return jsonify([{'reward_type': threshold.reward_type, 'threshold': threshold.threshold}])
 
 
-@app.route('/api/threshold/update/<reward_type>', methods=['PUT'])
-def update_threshold(reward_type):
-    thres_json = request.get_json()
-
-    if thres_json is None or 'threshold' not in thres_json:
-        abort(400)
-
-    threshold = queries.get_threshold(reward_type)
-    threshold.threshold = thres_json['threshold']
-    queries.update_threshold(threshold)
-    return jsonify({'reward_type': threshold.reward_type, 'threshold': threshold.threshold})
+@app.route('/api/threshold/update/<reward_type>/<threshold>', methods=['PUT'])
+def update_threshold(reward_type, threshold):
+    thresh = queries.get_threshold(reward_type)
+    thresh.threshold = threshold
+    queries.update_threshold(thresh)
+    return jsonify({'reward_type': thresh.reward_type, 'threshold': thresh.threshold})
 
 
 def set_up_db():
