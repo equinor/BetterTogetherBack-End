@@ -183,7 +183,7 @@ def add_pair():
 def check_for_reward():
     thresholds = queries.get_all_thresholds()
     for t in thresholds:
-        if t.threshold == len(queries.get_pairs_since_last_reward(t.reward_type)):
+        if t.threshold <= len(queries.get_pairs_since_last_reward(t.reward_type)):
             queries.add_reward(Reward(t.reward_type))
 
 
