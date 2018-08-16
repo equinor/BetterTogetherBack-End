@@ -46,7 +46,7 @@ d3.json("api/user/active?token=" + token, (users) => {
                 }));
                 simulation.force("link", d3.forceLink().links(newLinks).strength(1));
                 if(newLinks.length !== links.length){
-                    simulation.alpha(1).restart();
+                    simulation.alpha(0.5).restart();
                 } else {
                     simulation.restart();
                 }
@@ -195,9 +195,9 @@ d3.json("api/user/active?token=" + token, (users) => {
     setInterval(updateData, 5000);
 
     simulation = d3.forceSimulation(users)
-        .force("collision", d3.forceCollide().radius(radius + 10))
+        .force("collision", d3.forceCollide().radius(radius + 20))
         .force("center", d3.forceCenter(width / 2, height / 2))
-        .force("charge", d3.forceManyBody().strength(10))
+        .force("charge", d3.forceManyBody())
         .force("link", d3.forceLink().links(links).strength(1))
         .on("tick", ticked);
 
