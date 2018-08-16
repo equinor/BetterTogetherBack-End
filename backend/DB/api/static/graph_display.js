@@ -91,6 +91,7 @@ d3.json("api/user/active?token=" + token, (users) => {
         classLink.enter()
             .append("line")
             .merge(classLink)
+            .attr("stroke-width", (d) => 4*Math.log2(d.total)+1)
             .attr("stroke", (d) => {
                 if (isLastPairEdge(d)) {
                     return "rgba(255, 18, 67, 1)";
