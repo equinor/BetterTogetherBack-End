@@ -24,12 +24,16 @@ d3.json("api/user/active?token=" + token, (users) => {
                 let pizzaPercent = (status.pizza_count / status.pizza_thres) * 100;
                 d3.selectAll("span").remove();
                 d3.select("#cake-percentage")
-                    .attr("style", "width:" + cakePercent + "%")
+                    .attr("style", "width:" + cakePercent + "%");
+
+                d3.select("#cake-text")
                     .append("span")
                     .text(status.cake_count + "/" + status.cake_thres);
 
                 d3.select("#pizza-percentage")
-                    .attr("style", "width:" + pizzaPercent + "%")
+                    .attr("style", "width:" + pizzaPercent + "%");
+
+                d3.select("#pizza-text")
                     .append("span")
                     .text(status.pizza_count + "/" + status.pizza_thres);
 
