@@ -24,12 +24,16 @@ d3.json("api/user/active?token=" + token, (users) => {
                 let pizzaPercent = (status.pizza_count / status.pizza_thres) * 100;
                 d3.selectAll("span").remove();
                 d3.select("#cake-percentage")
-                    .attr("style", "width:" + cakePercent + "%")
+                    .attr("style", "width:" + cakePercent + "%");
+
+                d3.select("#cake-text")
                     .append("span")
                     .text(status.cake_count + "/" + status.cake_thres);
 
                 d3.select("#pizza-percentage")
-                    .attr("style", "width:" + pizzaPercent + "%")
+                    .attr("style", "width:" + pizzaPercent + "%");
+
+                d3.select("#pizza-text")
                     .append("span")
                     .text(status.pizza_count + "/" + status.pizza_thres);
 
@@ -42,7 +46,7 @@ d3.json("api/user/active?token=" + token, (users) => {
                 }));
                 simulation.force("link", d3.forceLink().links(newLinks).strength(1));
                 if(newLinks.length !== links.length){
-                    simulation.alpha(1).restart();
+                    simulation.alpha(0.5).restart();
                 } else {
                     simulation.restart();
                 }
@@ -87,12 +91,12 @@ d3.json("api/user/active?token=" + token, (users) => {
         classLink.enter()
             .append("line")
             .merge(classLink)
-            .attr("stroke-width", (d) => d.total)
+            .attr("stroke-width", (d) => 4*Math.log2(d.total)+1)
             .attr("stroke", (d) => {
                 if (isLastPairEdge(d)) {
-                    return 'red';
+                    return "rgba(255, 18, 67, 1)";
                 } else {
-                    return "black";
+                    return "rgba(0, 112, 121, 1)";
                 }
             })
             .attr("x1", (d) => d.source.x)
@@ -192,9 +196,9 @@ d3.json("api/user/active?token=" + token, (users) => {
     setInterval(updateData, 5000);
 
     simulation = d3.forceSimulation(users)
-        .force("collision", d3.forceCollide().radius(radius + 10))
+        .force("collision", d3.forceCollide().radius(radius + 20))
         .force("center", d3.forceCenter(width / 2, height / 2))
-        .force("charge", d3.forceManyBody().strength(10))
+        .force("charge", d3.forceManyBody())
         .force("link", d3.forceLink().links(links).strength(1))
         .on("tick", ticked);
 
