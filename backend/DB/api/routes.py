@@ -10,23 +10,23 @@ from backend.slack import slackbot
 
 
 def update_users():
-    app.app_context().push()
-    users = queries.get_all_users()
-    active_users = queries.get_active_users()
-    slack_users = slackbot.get_persons_from_slack()
-    # update and add users from slack
-    for slack_user in slack_users:
-        if not any(user.username == slack_user['username'] for user in users):
-            queries.add_user(User(slack_user['username'], slack_user['name'], slack_user['image']))
-        else:
-            user = User(slack_user['username'], slack_user['name'], slack_user['image'])
-            user.active = True
-            queries.update_user(user)
-    #set users to inactive if they are not present in slack users
-    for user in active_users:
-        if not any(user.username == u['username'] for u in slack_users):
-            user.active = False
-            queries.update_user(user)
+    with app.app_context():
+        users = queries.get_all_users()
+        active_users = queries.get_active_users()
+        slack_users = slackbot.get_persons_from_slack()
+        # update and add users from slack
+        for slack_user in slack_users:
+            if not any(user.username == slack_user['username'] for user in users):
+                queries.add_user(User(slack_user['username'], slack_user['name'], slack_user['image']))
+            else:
+                user = User(slack_user['username'], slack_user['name'], slack_user['image'])
+                user.active = True
+                queries.update_user(user)
+        #set users to inactive if they are not present in slack users
+        for user in active_users:
+            if not any(user.username == u['username'] for u in slack_users):
+                user.active = False
+                queries.update_user(user)
 
 
 app = Flask(__name__)
