@@ -3,7 +3,6 @@ from backend.DB.api.tables import db
 from flask import jsonify, request, abort, render_template, Flask
 import os
 from flask_apscheduler import APScheduler
-from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 
 from backend.DB.api.tables import User, Pair, Reward, Threshold
 from backend.slack import slackbot
@@ -42,7 +41,6 @@ app.config['JOBS'] = [{
     'trigger': 'interval',
     'hours': 2,
 }]
-app.config['SCHEDULER_JOBSTORES'] = {'default': SQLAlchemyJobStore(url=app.config['SQLALCHEMY_DATABASE_URI'])}
 app.config['SCHEDULER_API_ENABLED'] = True
 
 
