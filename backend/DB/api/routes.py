@@ -211,6 +211,7 @@ def update_threshold(reward_type, threshold):
 
 
 def set_up_db():
+    # db.drop_all()
     db.create_all()
     update_users()
     threshold1 = Threshold('pizza', 13)
