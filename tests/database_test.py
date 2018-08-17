@@ -141,13 +141,21 @@ class DatabaseTester(unittest.TestCase):
         pair1 = {'person1': 'test1', 'person2': 'test2'}
         pair2 = {'person1': 'test2', 'person2': 'test1'}
         pair3 = {'person1': 'test1', 'person2': 'test3'}
+        date1 = math.floor(datetime.datetime.now().timestamp() * 1000)
         self.app.post('/api/pair/add{}'.format(token), data=json.dumps(pair1), content_type='application/json')
         self.app.post('/api/pair/add{}'.format(token), data=json.dumps(pair2), content_type='application/json')
+        date2 = math.floor(datetime.datetime.now().timestamp() * 1000)
         self.app.post('/api/pair/add{}'.format(token), data=json.dumps(pair3), content_type='application/json')
-        response = self.app.get('/api/pair/count_pair{}'.format(token)).json
+        response = self.app.get('/api/pair/count_pair/{}{}'.format(date1, token)).json
         self.assertEqual(2, len(response))
-        self.assertEqual(2, response[0]['total'])
-        self.assertEqual(1, response[1]['total'])
+        for counter_obj in response:
+            if counter_obj['target'] == 'test2':
+                self.assertEqual(2, counter_obj['total'])
+            if counter_obj['target'] == 'test3':
+                self.assertEqual(1, counter_obj['total'])
+        response = self.app.get('/api/pair/count_pair/{}{}'.format(date2, token)).json
+        self.assertEqual(1, len(response))
+        self.assertEqual(1, response[0]['total'])
 
     def test_get_reward_count(self):
         queries.add_reward(Reward('pizza'))

@@ -1,5 +1,5 @@
+import datetime
 import math
-import time
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey
@@ -36,7 +36,7 @@ class Pair(db.Model):
         if date is None:
             # Pair class requires integer date, not float.
             # Use ms not s to round off to avoid conflicts on primary key
-            self.date = math.floor(time.time() * 1000)
+            self.date = math.floor(datetime.datetime.now().timestamp() * 1000)
         else:
             self.date = date
         self.person1 = person1
@@ -61,7 +61,7 @@ class Reward(db.Model):
         if not date:
             # Pair class requires integer date, not float.
             # Use ms not s to round off to avoid conflicts on primary key
-            self.date = math.floor(time.time() * 1000)
+            self.date = math.floor(datetime.datetime.now().timestamp() * 1000)
         else:
             self.date = date
         self.reward_type = reward_type

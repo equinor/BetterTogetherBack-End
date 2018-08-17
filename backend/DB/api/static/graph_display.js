@@ -9,6 +9,14 @@ let radius = width / 30;
 
 let token = (new URL(document.location)).searchParams.get("token");
 
+let days =
+    function () {
+    if (parseInt((new URL(document.location)).searchParams.get("days"))) {
+        return  parseInt((new URL(document.location)).searchParams.get("days"));
+    }
+    return 30;
+};
+
 let setHeight = d3.select("#content")
     .attr("height", window.innerHeight);
 
@@ -16,7 +24,9 @@ d3.json("api/user/active?token=" + token, (users) => {
     let status = {};
     let edgeUsers = {};
     function updateData(){
-        d3.json("api/pair/count_pair?token=" + token, (edges) => {
+        //Unix time stamp x days ago
+        let date = Date.now()-1000*3600*24*days();
+        d3.json("api/pair/count_pair/"+date.toString()+"?token=" + token, (edges) => {
             d3.json("api/reward/progress?token=" + token, (newStatus) => {
                 status = newStatus;
                 edgeUsers = edges;
