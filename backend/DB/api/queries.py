@@ -1,7 +1,8 @@
-from sqlalchemy import or_, and_
-from backend.DB.api.tables import db
-from backend.DB.api import tables
+from sqlalchemy import and_
 from sqlalchemy.exc import IntegrityError
+
+from backend.DB.api import tables
+from backend.DB.api.tables import db
 
 
 # Queries for User
@@ -75,9 +76,10 @@ def get_pairs_from_date(date):
     return tables.Pair.query.filter(tables.Pair.date >= date).all()
 
 
-def get_pair_counts_between_all_users():
+def get_pair_counts_between_all_users(date):
     pairs = db.session.query(tables.Pair.person1, tables.Pair.person2, db.func.count(
-        tables.Pair.person1)).group_by(tables.Pair.person1, tables.Pair.person2).all()
+        tables.Pair.person1)).filter(tables.Pair.date >= date).group_by(
+        tables.Pair.person1, tables.Pair.person2).all()
     counters = []
     for pair in pairs:
         should_add_pair = True

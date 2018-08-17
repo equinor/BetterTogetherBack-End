@@ -161,9 +161,9 @@ def get_pairs_since_last_used_reward(reward_type):
     return jsonify(format_pairs(pairs))
 
 
-@app.route('/api/pair/count_pair', methods=['GET'])
-def get_pair_count_between_all_users():
-    counters = queries.get_pair_counts_between_all_users()
+@app.route('/api/pair/count_pair/<date>', methods=['GET'])
+def get_pair_count_between_all_users(date):
+    counters = queries.get_pair_counts_between_all_users(date)
     return jsonify(counters)
 
 
