@@ -17,6 +17,10 @@ def get_persons_from_slack():
             person = dict()
             profile = client.api_call("users.profile.get", user=member)['profile']
             person['username'] = profile['display_name_normalized']
+
+            if person['username'] == '':
+                person['username'] = profile['real_name']
+
             if 'image_192' not in profile.keys():
                 person['image'] = "unknown"
             else:
